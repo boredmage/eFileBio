@@ -33,6 +33,7 @@ export interface caFormInterface {
   lastName: string;
   middleName: string;
   firstName: string;
+  suffix: string;
   dob: string;
   addressType: string;
   country: string;

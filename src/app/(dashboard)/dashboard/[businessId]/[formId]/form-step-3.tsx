@@ -98,30 +98,23 @@ const SectionForm = ({
   const caError = (error?.[level] || {}) as FormikErrors<caFormInterface>;
 
   useEffect(() => {
-    setFieldValue(`ca.${level}.identification.state`, "");
-    setFieldValue(`ca.${level}.identification.otherTribe`, "");
-    setFieldValue(`ca.${level}.identification.localTribal`, "");
+    // setFieldValue(`ca.${level}.identification.state`, "");
+    // setFieldValue(`ca.${level}.identification.otherTribe`, "");
+    // setFieldValue(`ca.${level}.identification.localTribal`, "");
 
     const isPriorityCty = priorityCountries.some(
       (country) => country.value === caValue.identification.jurisdiction,
     );
     setIsPriorityJurisdiction(isPriorityCty);
-    if (isPriorityCty) {
-      setFieldValue(
-        `ca.${level}.identification.state`,
-        caValue.identification.jurisdiction,
-      );
-    } else {
-      setFieldValue(`ca.${level}.identification.state`, "");
-    }
+    // if (isPriorityCty && caValue.identification.jurisdiction !== "US") {
+    //   setFieldValue(
+    //     `ca.${level}.identification.state`,
+    //     caValue.identification.jurisdiction,
+    //   );
+    // } else {
+    //   setFieldValue(`ca.${level}.identification.state`, "");
+    // }
   }, [caValue.identification.jurisdiction]);
-
-  useEffect(() => {
-    setFieldValue(`ca.${level}.identification.state`, "");
-    setFieldValue(`ca.${level}.identification.jurisdiction`, "");
-    setFieldValue(`ca.${level}.identification.otherTribe`, "");
-    setFieldValue(`ca.${level}.identification.localTribal`, "");
-  }, [caValue.identification.type]);
 
   useEffect(() => {
     const isUnitedStates = caValue.country === "US";
@@ -130,21 +123,7 @@ const SectionForm = ({
     );
     setIsPriorityCountry(isPriorityCty);
     setIsUnitedStates(isUnitedStates);
-
-    if (isPriorityCty && !isUnitedStates) {
-      setFieldValue(`ca.${level}.state`, caValue.country);
-    } else {
-      setFieldValue(`ca.${level}.state`, "");
-    }
   }, [caValue.country]);
-
-  useEffect(() => {
-    if (caValue.identification.type === "39") {
-      setFieldValue(`ca.${level}.identification.jurisdiction`, "US");
-    } else {
-      setFieldValue(`ca.${level}.identification.jurisdiction`, "");
-    }
-  }, [caValue.identification.type]);
 
   const getStateForCountry = (dependentCountry: string) => {
     const priorityCountry = priorityCountries.find(
@@ -170,6 +149,13 @@ const SectionForm = ({
     } else {
       return sortedCountries;
     }
+  };
+
+  const clearIdentificationData = () => {
+    setFieldValue(`ca.${level}.identification.state`, "");
+    setFieldValue(`ca.${level}.identification.jurisdiction`, "");
+    setFieldValue(`ca.${level}.identification.otherTribe`, "");
+    setFieldValue(`ca.${level}.identification.localTribal`, "");
   };
 
   return (
@@ -244,7 +230,10 @@ const SectionForm = ({
             />
           </div>
           <div className="grid grid-cols-2 gap-6">
-            <FormInput label="Suffix" />
+            <FormInput
+              label="Suffix"
+              {...getFieldProps(`ca.${level}.suffix`)}
+            />
             <FormDate
               label="Date of birth"
               placeholder="01/01/2024"
@@ -283,7 +272,20 @@ const SectionForm = ({
               isRequired
               name={`ca.${level}.country`}
               selectedKey={caValue.country}
-              setFieldValue={setFieldValue}
+              setFieldValue={(field, value) => {
+                const isUnitedStates = value === "US";
+                const isPriorityCty = priorityCountries.some(
+                  (country) => country.value === value,
+                );
+
+                if (isPriorityCty && !isUnitedStates) {
+                  setFieldValue(`ca.${level}.state`, value);
+                } else {
+                  setFieldValue(`ca.${level}.state`, "");
+                }
+
+                return setFieldValue(field, value);
+              }}
               onBlur={handleBlur}
               isInvalid={caTouched?.country && !!caError?.country}
               errorMessage={caTouched?.country && caError?.country}
@@ -337,7 +339,20 @@ const SectionForm = ({
               name={`ca.${level}.identification.type`}
               isRequired
               selectedKey={caValue.identification.type}
-              setFieldValue={setFieldValue}
+              setFieldValue={(field, value) => {
+                clearIdentificationData();
+
+                if (value === "39") {
+                  setFieldValue(
+                    `ca.${level}.identification.jurisdiction`,
+                    "US",
+                  );
+                } else {
+                  setFieldValue(`ca.${level}.identification.state`, "");
+                }
+
+                return setFieldValue(field, value);
+              }}
               onBlur={handleBlur}
               isInvalid={
                 caTouched?.identification?.type &&
@@ -370,7 +385,21 @@ const SectionForm = ({
               isRequired
               name={`ca.${level}.identification.jurisdiction`}
               selectedKey={caValue.identification.jurisdiction}
-              setFieldValue={setFieldValue}
+              setFieldValue={(field, value) => {
+                clearIdentificationData();
+
+                const isPriorityCty = priorityCountries.some(
+                  (country) => country.value === value,
+                );
+
+                if (isPriorityCty && value !== "US") {
+                  setFieldValue(`ca.${level}.identification.state`, value);
+                } else {
+                  setFieldValue(`ca.${level}.identification.state`, "");
+                }
+
+                return setFieldValue(field, value);
+              }}
               isInvalid={
                 caTouched?.identification?.jurisdiction &&
                 !!caError?.identification?.jurisdiction
@@ -398,7 +427,8 @@ const SectionForm = ({
                   !["37", "38"].includes(caValue.identification.type)) ||
                 !!caValue.identification.localTribal ||
                 (isPriorityJurisdiction &&
-                  caValue.identification.jurisdiction !== "US")
+                  caValue.identification.jurisdiction !== "US") ||
+                caValue.identification.type === "40"
               }
               isInvalid={
                 caTouched?.identification?.state &&

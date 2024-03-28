@@ -28,7 +28,7 @@ const formStep3Validation = Yup.array().of(
         jurisdiction: Yup.string().required("Country is required"),
         state: Yup.string().when(["type", "localTribe"], {
           is: (type: string, tribe: string) =>
-            type === "37" || (type === "38" && !tribe),
+            type === "37" || (type === "38" && tribe),
           then: (schema) => schema.required("State is required"),
           otherwise: (schema) => schema.notRequired(),
         }),

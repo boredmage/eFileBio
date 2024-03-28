@@ -66,6 +66,16 @@ const Form = () => {
   });
 
   useEffect(() => {
+    if (businessId && formId) {
+      const savedData = localStorage.getItem(
+        (businessId as string).concat(formId as string),
+      );
+
+      if (savedData) {
+        formData.setValues(JSON.parse(savedData));
+      }
+    }
+
     async function getFormData() {
       try {
         const response = await fetch(
@@ -85,6 +95,18 @@ const Form = () => {
 
     getFormData();
   }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.log("Saving...");
+      localStorage.setItem(
+        (businessId as string).concat(formId as string),
+        JSON.stringify(formData.values),
+      );
+    }, 1500);
+
+    return () => clearTimeout(timer);
+  }, [formData.values]);
 
   const handleNext = () => {
     formData.handleSubmit();

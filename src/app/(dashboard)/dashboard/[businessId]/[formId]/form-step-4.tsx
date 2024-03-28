@@ -22,7 +22,7 @@ import clsx from "clsx";
 import { FormikErrors, FormikProps } from "formik";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { caFormShape } from "./form-shape";
+import { boFormShape } from "./form-shape";
 import { iFormType } from "./page";
 import { boFormInterface } from "@/types";
 
@@ -30,11 +30,11 @@ const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
   const [section, setSection] = useState([{}]);
   const { values, setValues, setFieldValue, handleSubmit, submitForm } =
     formData;
-  const { ca } = values;
+  const { bo } = values;
 
   const handleAddSection = () => {
     setSection([...section, {}]);
-    setFieldValue("ca", [...ca, caFormShape]);
+    setFieldValue("bo", [...bo, boFormShape]);
     console.log("Add new section");
   };
 
@@ -42,8 +42,8 @@ const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
     if (section.length === 1) return;
     setSection(section.filter((_, i) => i !== index));
     setFieldValue(
-      "ca",
-      ca.filter((_, i) => i !== index),
+      "bo",
+      bo.filter((_, i) => i !== index),
     );
   };
 
@@ -215,6 +215,7 @@ const SectionForm = ({
         <div className="py-6">
           <Checkbox
             color="warning"
+            isSelected={boValue.isParentGuardianInformation}
             className="items-start"
             classNames={{
               icon: "text-white",

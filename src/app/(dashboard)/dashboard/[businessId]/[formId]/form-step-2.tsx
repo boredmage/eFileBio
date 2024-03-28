@@ -13,7 +13,7 @@ import {
 import { tribalJurisdiction } from "@/utils/tribalJurisdiction";
 import { Button, Checkbox, Divider } from "@nextui-org/react";
 import { FormikProps } from "formik";
-import { Minus, MoveRight, Plus } from "lucide-react";
+import { Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { iFormType } from "./page";
 
@@ -47,6 +47,12 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
   };
 
   useEffect(() => {
+    setRcAlternateNameCount(
+      rcValue.alternateNames.length > 0 ? rcValue.alternateNames.length : 1,
+    );
+  }, []);
+
+  useEffect(() => {
     if (rcValue.taxType !== "foreign") {
       resetValueOnDiff("taxJurisdiction");
     }
@@ -57,42 +63,10 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
     const isPriorityCty = priorityCountries
       .map((c) => c.value)
       .includes(rcValue.jurisdiction);
+
     setIsUnitedStates(isUnitedStates);
     setIsPriorityCountry(isPriorityCty);
-
-    if (isUnitedStates || !isPriorityCty) {
-      [
-        "domesticState",
-        "domesticTribalJurisdiction",
-        "domesticOtherTribe",
-        "foreignFirstState",
-        "foreignTribalJurisdiction",
-        "foreignOtherTribe",
-      ].forEach((field) => {
-        resetValueOnDiff(field as keyof typeof rcValue);
-        setFieldError(`rc[${field}]`, "");
-        setFieldTouched(`rc[${field}]`, false);
-      });
-    }
-    if (isPriorityCty && !isUnitedStates) {
-      setFieldValue("rc.domesticState", rcValue.jurisdiction);
-    }
   }, [rcValue.jurisdiction]);
-
-  useEffect(() => {
-    const isAdUs = rcValue.country === "US";
-    const isAdPriorityCty = priorityCountries
-      .map((c) => c.value)
-      .includes(rcValue.country);
-    setIsAdUnitedStates(isAdUs);
-    setIsAdPriorityCountry(isAdPriorityCty);
-
-    if (isAdPriorityCty && !isAdUs) {
-      setFieldValue("rc.state", rcValue.country);
-    } else {
-      resetValueOnDiff("state");
-    }
-  }, [rcValue.country]);
 
   useEffect(() => {
     setFieldValue("rc.foreignOtherTribe", "");
@@ -118,6 +92,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
         <div className="flex items-center gap-6">
           <Checkbox
             color="warning"
+            isSelected={rcValue.isRequestingId}
             classNames={{
               icon: "text-white",
             }}
@@ -127,6 +102,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
           </Checkbox>
           <Checkbox
             color="warning"
+            isSelected={rcValue.isForeignPooledInvestmentVehicle}
             classNames={{
               icon: "text-white",
             }}
@@ -242,7 +218,31 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             name="rc.jurisdiction"
             placeholder="Select a country"
             selectedKey={rcValue.jurisdiction}
-            setFieldValue={setFieldValue}
+            setFieldValue={(field, value) => {
+              const isUnitedStates = value === "US";
+              const isPriorityCty = priorityCountries
+                .map((c) => c.value)
+                .includes(value as string);
+
+              if (isUnitedStates || !isPriorityCty) {
+                [
+                  "domesticState",
+                  "domesticTribalJurisdiction",
+                  "domesticOtherTribe",
+                  "foreignFirstState",
+                  "foreignTribalJurisdiction",
+                  "foreignOtherTribe",
+                ].forEach((field) => {
+                  resetValueOnDiff(field as keyof typeof rcValue);
+                  setFieldError(`rc[${field}]`, "");
+                  setFieldTouched(`rc[${field}]`, false);
+                });
+              }
+              if (isPriorityCty && !isUnitedStates) {
+                setFieldValue("rc.domesticState", value);
+              }
+              return setFieldValue(field, value);
+            }}
             onBlur={handleBlur}
             isInvalid={rcTouched?.jurisdiction && !!rcError?.jurisdiction}
             errorMessage={rcTouched?.jurisdiction && rcError?.jurisdiction}
@@ -361,7 +361,21 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             label="U.S. or U.S. Territory"
             name="rc.country"
             selectedKey={rcValue.country}
-            setFieldValue={setFieldValue}
+            setFieldValue={(field, value) => {
+              const isAdUs = value === "US";
+              const isAdPriorityCty = priorityCountries
+                .map((c) => c.value)
+                .includes(value as string);
+              setIsAdUnitedStates(isAdUs);
+              setIsAdPriorityCountry(isAdPriorityCty);
+
+              if (isAdPriorityCty && !isAdUs) {
+                setFieldValue("rc.state", value);
+              } else {
+                resetValueOnDiff("state");
+              }
+              return setFieldValue(field, value);
+            }}
             isRequired
             onBlur={handleBlur}
             isInvalid={rcTouched?.country && !!rcError?.country}
