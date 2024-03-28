@@ -1,4 +1,4 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { DefaultSession, getServerSession } from "next-auth";
 import { prisma } from "./db";
 
@@ -9,7 +9,7 @@ export default async function auth() {
     return;
   }
 
-  const user: DefaultSession["user"] = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { email: session.user.email },
   });
 

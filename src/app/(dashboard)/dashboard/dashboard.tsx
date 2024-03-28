@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { Business } from "@prisma/client/edge";
 import BusinessCard from "./components/business-card";
 import { CreateBusinessModal } from "./components/create-business-modal";

@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { prisma } from "./db";
 import { z } from "zod";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 
 const BusinessSchema = z.object({
   name: z.coerce

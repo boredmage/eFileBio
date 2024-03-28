@@ -98,7 +98,14 @@ const FormStep1 = ({
           <FormInput
             name="datePrepared"
             label="Date prepared (auto filled)"
-            value={datePrepared.toLocaleDateString()}
+            value={datePrepared
+              .toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              })
+              .split("/")
+              .join(" / ")}
             disabled
           />
         </div>

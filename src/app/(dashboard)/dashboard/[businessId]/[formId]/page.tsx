@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Button, Progress } from "@nextui-org/react";
+import { Avatar, Button, Progress, useDisclosure } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import FormTab from "../../components/form-tab";
 import FormSteps from "./form-steps";
@@ -11,6 +11,7 @@ import { boFormShape, caFormShape } from "./form-shape";
 import { ArrowLeft, MoveRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { boFormInterface } from "@/types/form-types";
+import FormCompletionModal from "../../components/form-completion-modal";
 
 export type iFormType = {
   fi: fiFormInterface;
@@ -25,6 +26,11 @@ const Form = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [businessLogo, setBusinessLogo] = useState("");
   const [datePrepared, setDatePrepared] = useState(new Date());
+  const {
+    isOpen: modalIsOpen,
+    onOpen: fileOpenHandler,
+    onOpenChange: modalOpenChangeHandler,
+  } = useDisclosure();
 
   const formData = useFormik<iFormType>({
     initialValues: {
@@ -109,7 +115,11 @@ const Form = () => {
   }, [formData.values]);
 
   const handleNext = () => {
-    formData.handleSubmit();
+    if (activeTab === 3) {
+      fileOpenHandler();
+    } else {
+      formData.handleSubmit();
+    }
 
     if (activeTab === 0 && !formData.errors.fi) {
       setActiveTab((currentIndex) => currentIndex + 1);
@@ -200,8 +210,13 @@ const Form = () => {
             className="text-white"
             onClick={handleNext}
           >
-            Next
+            {activeTab === 3 ? "File BOIR" : "Next"}
           </Button>
+          <FormCompletionModal
+            isOpen={modalIsOpen}
+            businessLogo={businessLogo}
+            onOpenChange={modalOpenChangeHandler}
+          />
         </div>
       </div>
     </div>
