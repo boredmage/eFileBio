@@ -19,55 +19,68 @@ const BusinessSchema = z.object({
   logo: z.string(),
 });
 
-export async function createBusiness(formData: FormData) {
-  const session = await getServerSession(authOptions);
+export async function createBusiness(_prevState: any, formData: FormData) {
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session || !session.user || !session.user.email) {
-    redirect("/login");
-  }
+    if (!session || !session.user || !session.user.email) {
+      return {
+        message: "Unauthenticated",
+      };
+    }
 
-  const businessFormData = BusinessSchema.safeParse({
-    logo: formData.get("logoUrl"),
-    name: formData.get("businessName"),
-    description: formData.get("businessDescription"),
-  });
+    const businessFormData = BusinessSchema.safeParse({
+      logo: formData.get("logoUrl"),
+      name: formData.get("businessName"),
+      description: formData.get("businessDescription"),
+    });
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
 
-  if (!user) {
-    redirect("/");
-  }
+    if (!user) {
+      return {
+        message: "Unauthorized",
+      };
+    }
 
-  if (!businessFormData.success) {
+    if (!businessFormData.success) {
+      return {
+        errors: businessFormData.error.flatten().fieldErrors,
+      };
+    }
+
+    const newBusiness = await prisma.business.create({
+      data: {
+        logo: businessFormData.data.logo,
+        name: businessFormData.data.name,
+        description: businessFormData.data.description,
+        ownerId: user.id,
+      },
+    });
+
+    if (!newBusiness) {
+      return {
+        errors: {
+          server: "Failed to create business",
+        },
+      };
+    }
+
+    revalidatePath("/dashboard");
     return {
-      errors: businessFormData.error.flatten().fieldErrors,
+      business: newBusiness,
+      created: true,
     };
-  }
-
-  const newBusiness = await prisma.business.create({
-    data: {
-      logo: businessFormData.data.logo,
-      name: businessFormData.data.name,
-      description: businessFormData.data.description,
-      ownerId: user.id,
-    },
-  });
-
-  if (!newBusiness) {
+  } catch (error) {
+    console.log(error);
     return {
       errors: {
-        server: "Failed to create business",
+        message: "An error occurred",
       },
     };
   }
-
-  revalidatePath("/dashboard");
-  return {
-    business: newBusiness,
-    created: true,
-  };
 }
 
 export async function createForm(data: { businessId: string }) {
