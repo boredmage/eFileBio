@@ -103,9 +103,16 @@ export async function createForm(data: { businessId: string }) {
     });
   }
 
+  const formCount = await prisma.form.count({
+    where: {
+      businessId: business.id,
+    },
+  });
+
   const newForm = await prisma.form.create({
     data: {
       businessId: business.id,
+      version: formCount + 1,
     },
   });
 
