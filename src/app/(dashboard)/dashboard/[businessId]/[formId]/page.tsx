@@ -7,7 +7,12 @@ import FormSteps from "./form-steps";
 import { FormikProps, useFormik } from "formik";
 import { fiFormInterface, rcFormInterface, caFormInterface } from "@/types";
 import { formValidation } from "@/utils/validations";
-import { boFormShape, caFormShape } from "./form-shape";
+import {
+  boFormShape,
+  caFormShape,
+  fiFormShape,
+  rcFormShape,
+} from "./form-shape";
 import { ArrowLeft, MoveRight } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { boFormInterface } from "@/types/form-types";
@@ -34,34 +39,8 @@ const Form = () => {
 
   const formData = useFormik<iFormType>({
     initialValues: {
-      fi: {
-        filingType: "",
-        legalName: "",
-        taxType: "",
-        taxId: "",
-        taxJurisdiction: "",
-      },
-      rc: {
-        isForeignPooledInvestmentVehicle: false,
-        isRequestingId: false,
-        legalName: "",
-        alternateNames: [],
-        taxType: "",
-        taxId: "",
-        taxJurisdiction: "",
-        jurisdiction: "",
-        domesticState: "",
-        domesticTribalJurisdiction: "",
-        domesticOtherTribe: "",
-        foreignFirstState: "",
-        foreignTribalJurisdiction: "",
-        foreignOtherTribe: "",
-        country: "",
-        address: "",
-        city: "",
-        state: "",
-        zip: "",
-      },
+      fi: fiFormShape,
+      rc: rcFormShape,
       ca: [caFormShape],
       bo: [boFormShape],
     },
@@ -115,7 +94,13 @@ const Form = () => {
   }, [formData.values]);
 
   const handleNext = () => {
-    if (activeTab === 3) {
+    if (
+      activeTab === 3 &&
+      !formData.errors.bo &&
+      !formData.errors.ca &&
+      !formData.errors.fi &&
+      !formData.errors.rc
+    ) {
       fileOpenHandler();
     } else {
       formData.handleSubmit();

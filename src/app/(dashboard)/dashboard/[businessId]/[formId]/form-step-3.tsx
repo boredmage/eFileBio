@@ -493,7 +493,7 @@ const SectionForm = ({
               Add Attachment
             </Button>
           </div>
-          <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
+          {/* <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
             <div className="flex w-fit gap-4">
               <Avatar
                 src={"/pdf-logo.png"}
@@ -509,7 +509,7 @@ const SectionForm = ({
             <Button isIconOnly size="lg" className="bg-white shadow-sm">
               <Trash2 className="text-red-500" />
             </Button>
-          </div>
+          </div> */}
         </div>
       </AccordionItem>
     </Accordion>

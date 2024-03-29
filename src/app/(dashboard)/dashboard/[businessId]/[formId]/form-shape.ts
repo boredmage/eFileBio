@@ -1,6 +1,36 @@
 import { caFormInterface } from "@/types";
 import { boFormInterface } from "@/types/form-types";
 
+export const fiFormShape = {
+  filingType: "",
+  legalName: "",
+  taxType: "",
+  taxId: "",
+  taxJurisdiction: "",
+};
+
+export const rcFormShape = {
+  isForeignPooledInvestmentVehicle: false,
+  isRequestingId: false,
+  legalName: "",
+  alternateNames: [],
+  taxType: "",
+  taxId: "",
+  taxJurisdiction: "",
+  jurisdiction: "",
+  domesticState: "",
+  domesticTribalJurisdiction: "",
+  domesticOtherTribe: "",
+  foreignFirstState: "",
+  foreignTribalJurisdiction: "",
+  foreignOtherTribe: "",
+  country: "",
+  address: "",
+  city: "",
+  state: "",
+  zip: "",
+};
+
 export const caFormShape: caFormInterface = {
   fincenId: "",
   lastName: "",

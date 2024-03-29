@@ -247,10 +247,20 @@ const SectionForm = ({
           <h2 className="font-semibold">Exempt entity</h2>
           <Checkbox
             color="warning"
+            isSelected={boValue.isExemptEntity}
             classNames={{
               icon: "text-white",
             }}
-            {...getFieldProps(`bo.${level}.isExemptEntity`)}
+            onValueChange={(isSelected) => {
+              if (isSelected) {
+                const lastNames = boValue.lastName;
+                setFieldValue(`bo.${level}`, boFormShape);
+                setFieldValue(`bo.${level}.lastName`, lastNames);
+              } else {
+                setFieldValue(`bo.${level}`, boFormShape);
+              }
+              setFieldValue(`bo.${level}.isExemptEntity`, isSelected);
+            }}
           >
             Is this an Exempt entity
           </Checkbox>
@@ -271,7 +281,7 @@ const SectionForm = ({
               {...getFieldProps(`bo.${level}.middleName`)}
             />
             <FormInput
-              label="Individual's last name"
+              label="Individual's last name or entity's legal name"
               isRequired
               {...getFieldProps(`bo.${level}.lastName`)}
               isInvalid={caTouched?.lastName && !!caError?.lastName}
@@ -279,7 +289,10 @@ const SectionForm = ({
             />
           </div>
           <div className="grid grid-cols-2 gap-6">
-            <FormInput label="Suffix" />
+            <FormInput
+              label="Suffix"
+              {...getFieldProps(`bo.${level}.suffix`)}
+            />
             <FormDate
               label="Date of birth"
               placeholder="01/01/2024"
@@ -481,7 +494,7 @@ const SectionForm = ({
               Add Attachment
             </Button>
           </div>
-          <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
+          {/* <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
             <div className="flex w-fit gap-4">
               <Avatar
                 src={"/pdf-logo.png"}
@@ -497,7 +510,7 @@ const SectionForm = ({
             <Button isIconOnly size="lg" className="bg-white shadow-sm">
               <Trash2 className="text-red-500" />
             </Button>
-          </div>
+          </div> */}
         </div>
       </AccordionItem>
     </Accordion>
