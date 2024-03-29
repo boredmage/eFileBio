@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import { Input, InputProps } from "@nextui-org/react";
 
 const FormInput = ({
@@ -7,7 +8,7 @@ const FormInput = ({
   ...props
 }: InputProps) => {
   return (
-    <div className="flex-1">
+    <div className={cn("flex-1", props.className)}>
       <Input
         type={type}
         label={<span className="text-sm text-[#404040]">{label}</span>}

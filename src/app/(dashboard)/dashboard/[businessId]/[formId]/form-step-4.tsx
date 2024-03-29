@@ -212,37 +212,41 @@ const SectionForm = ({
         }
         classNames={{ content: "overflow-hidden" }}
       >
-        <div className="py-6">
-          <Checkbox
-            color="warning"
-            isSelected={boValue.isParentGuardianInformation}
-            className="items-start"
-            classNames={{
-              icon: "text-white",
-              wrapper: "top-1",
-            }}
-            {...getFieldProps(`bo.${level}.isParentGuardianInformation`)}
-          >
-            <h2 className="font-semibold">
-              Parent/Guardian information instead of minor child
-            </h2>
-            <span className="text-[#404040]">
-              (check if the Beneficial Owner is a minor child and the
-              parent/guardian information is provided instead)
-            </span>
-          </Checkbox>
-        </div>
-        <Divider className="bg-[#F5F5F5]" />
-        <div className="space-y-6 py-6">
-          <h2 className="font-semibold">Beneficial Owner FinCEN ID:</h2>
-          <div className="grid grid-cols-1 gap-6">
-            <FormInput
-              label="FinCEN ID"
-              {...getFieldProps(`bo.${level}.fincenId`)}
-            />
-          </div>
-        </div>
-        <Divider className="bg-[#F5F5F5]" />
+        {!boValue.isExemptEntity && (
+          <>
+            <div className="py-6">
+              <Checkbox
+                color="warning"
+                isSelected={boValue.isParentGuardianInformation}
+                className="items-start"
+                classNames={{
+                  icon: "text-white",
+                  wrapper: "top-1",
+                }}
+                {...getFieldProps(`bo.${level}.isParentGuardianInformation`)}
+              >
+                <h2 className="font-semibold">
+                  Parent/Guardian information instead of minor child
+                </h2>
+                <span className="text-[#404040]">
+                  (check if the Beneficial Owner is a minor child and the
+                  parent/guardian information is provided instead)
+                </span>
+              </Checkbox>
+            </div>
+            <Divider className="bg-[#F5F5F5]" />
+            <div className="space-y-6 py-6">
+              <h2 className="font-semibold">Beneficial Owner FinCEN ID:</h2>
+              <div className="grid grid-cols-1 gap-6">
+                <FormInput
+                  label="FinCEN ID"
+                  {...getFieldProps(`bo.${level}.fincenId`)}
+                />
+              </div>
+            </div>
+            <Divider className="bg-[#F5F5F5]" />
+          </>
+        )}
         <div className="flex items-center justify-between py-6">
           <h2 className="font-semibold">Exempt entity</h2>
           <Checkbox
@@ -265,21 +269,25 @@ const SectionForm = ({
             Is this an Exempt entity
           </Checkbox>
         </div>
-        <Divider className="bg-[#F5F5F5]" />
+        {!boValue.isExemptEntity && <Divider className="bg-[#F5F5F5]" />}
         <div className="space-y-6 py-6">
           <h2 className="font-semibold">Full legal name and date of birth:</h2>
           <div className="grid grid-cols-3 gap-6">
-            <FormInput
-              label="First name"
-              isRequired
-              {...getFieldProps(`bo.${level}.firstName`)}
-              isInvalid={caTouched?.firstName && !!caError?.firstName}
-              errorMessage={caTouched?.firstName && caError?.firstName}
-            />
-            <FormInput
-              label="Middle name"
-              {...getFieldProps(`bo.${level}.middleName`)}
-            />
+            {!boValue.isExemptEntity && (
+              <>
+                <FormInput
+                  label="First name"
+                  isRequired
+                  {...getFieldProps(`bo.${level}.firstName`)}
+                  isInvalid={caTouched?.firstName && !!caError?.firstName}
+                  errorMessage={caTouched?.firstName && caError?.firstName}
+                />
+                <FormInput
+                  label="Middle name"
+                  {...getFieldProps(`bo.${level}.middleName`)}
+                />
+              </>
+            )}
             <FormInput
               label="Individual's last name or entity's legal name"
               isRequired
@@ -288,213 +296,220 @@ const SectionForm = ({
               errorMessage={caTouched?.lastName && caError?.lastName}
             />
           </div>
-          <div className="grid grid-cols-2 gap-6">
-            <FormInput
-              label="Suffix"
-              {...getFieldProps(`bo.${level}.suffix`)}
-            />
-            <FormDate
-              label="Date of birth"
-              placeholder="01/01/2024"
-              isRequired
-              setFieldValue={setFieldValue}
-              {...getFieldProps(`bo.${level}.dob`)}
-              isInvalid={caTouched?.dob && !!caError?.dob}
-              errorMessage={caTouched?.dob && caError?.dob}
-            />
-          </div>
+          {!boValue.isExemptEntity && (
+            <div className="grid grid-cols-2 gap-6">
+              <FormInput
+                label="Suffix"
+                {...getFieldProps(`bo.${level}.suffix`)}
+              />
+              <FormDate
+                label="Date of birth"
+                placeholder="01/01/2024"
+                isRequired
+                setFieldValue={setFieldValue}
+                {...getFieldProps(`bo.${level}.dob`)}
+                isInvalid={caTouched?.dob && !!caError?.dob}
+                errorMessage={caTouched?.dob && caError?.dob}
+              />
+            </div>
+          )}
         </div>
-        <Divider className="bg-[#F5F5F5]" />
-        <div className="space-y-6 py-6">
-          <h2 className="font-semibold">Residential address:</h2>
-          <div className="grid grid-cols-2 gap-6">
-            <FormSelect
-              listContent={sortedCountries}
-              label="Country/Jurisdiction"
-              isRequired
-              name={`bo.${level}.country`}
-              selectedKey={boValue.country}
-              setFieldValue={setFieldValue}
-              onBlur={handleBlur}
-              isInvalid={caTouched?.country && !!caError?.country}
-              errorMessage={caTouched?.country && caError?.country}
-            />
-            <FormInput
-              label="Address (number, street, and apt. or suite no.)"
-              isRequired
-              {...getFieldProps(`bo.${level}.address`)}
-              isInvalid={caTouched?.address && !!caError?.address}
-              errorMessage={caTouched?.address && caError?.address}
-            />
-          </div>
-          <div className="grid grid-cols-3 gap-6">
-            <FormInput
-              label="City"
-              isRequired
-              {...getFieldProps(`bo.${level}.city`)}
-              isInvalid={caTouched?.city && !!caError?.city}
-              errorMessage={caTouched?.city && caError?.city}
-            />
-            <FormSelect
-              listContent={getStateForCountry(boValue.country)}
-              label="State"
-              isRequired
-              name={`bo.${level}.state`}
-              selectedKey={boValue.state}
-              setFieldValue={setFieldValue}
-              onBlur={handleBlur}
-              isInvalid={caTouched?.state && !!caError?.state}
-              errorMessage={caTouched?.state && caError?.state}
-              isDisabled={!isUnitedStates && !!boValue.country}
-            />
-            <FormInput
-              label="ZIP/Foreign postal code*"
-              isRequired
-              {...getFieldProps(`bo.${level}.zip`)}
-              isInvalid={caTouched?.zip && !!caError?.zip}
-              errorMessage={caTouched?.zip && caError?.zip}
-            />
-          </div>
-        </div>
-        <Divider className="bg-[#F5F5F5]" />
-        <div className="space-y-6 py-6">
-          <h2 className="font-semibold">
-            Form of identification and issuing jurisdiction:
-          </h2>
-          <div className="grid grid-cols-2 gap-6">
-            <FormSelect
-              listContent={identifyingDocumentTypes}
-              label="Identifying document type"
-              name={`bo.${level}.identification.type`}
-              isRequired
-              selectedKey={boValue.identification.type}
-              setFieldValue={setFieldValue}
-              onBlur={handleBlur}
-              isInvalid={
-                caTouched?.identification?.type &&
-                !!caError?.identification?.type
-              }
-              errorMessage={
-                caTouched?.identification?.type && caError?.identification?.type
-              }
-            />
-            <FormInput
-              label="Identifying document number"
-              isRequired
-              {...getFieldProps(`bo.${level}.identification.id`)}
-              isInvalid={
-                caTouched?.identification?.id && !!caError?.identification?.id
-              }
-              errorMessage={
-                caTouched?.identification?.id && caError?.identification?.id
-              }
-            />
-          </div>{" "}
-          <h2 className="font-semibold">
-            Identifying document issuing jurisdiction{" "}
-            <span className="text-red-500">*</span>
-          </h2>
-          <div className="grid grid-cols-2 gap-6">
-            <FormSelect
-              listContent={getCountryForJurisdiction()}
-              label="Country/Jurisdiction"
-              isRequired
-              name={`bo.${level}.identification.jurisdiction`}
-              selectedKey={boValue.identification.jurisdiction}
-              setFieldValue={setFieldValue}
-              isInvalid={
-                caTouched?.identification?.jurisdiction &&
-                !!caError?.identification?.jurisdiction
-              }
-              errorMessage={
-                caTouched?.identification?.jurisdiction &&
-                caError?.identification?.jurisdiction
-              }
-              isDisabled={
-                boValue.identification.jurisdiction === "US" &&
-                boValue.identification.type === "39"
-              }
-            />
-            <FormSelect
-              listContent={getStateForCountry(
-                boValue.identification.jurisdiction,
-              )}
-              label="State"
-              isRequired
-              name={`bo.${level}.identification.state`}
-              selectedKey={boValue.identification.state}
-              setFieldValue={setFieldValue}
-              isDisabled={
-                (!!boValue.identification.jurisdiction &&
-                  !["37", "38"].includes(boValue.identification.type)) ||
-                !!boValue.identification.localTribal ||
-                (isPriorityJurisdiction &&
-                  boValue.identification.jurisdiction !== "US")
-              }
-              isInvalid={
-                caTouched?.identification?.state &&
-                !!caError?.identification?.state
-              }
-              errorMessage={
-                caTouched?.identification?.state &&
-                caError?.identification?.state
-              }
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-6">
-            <FormSelect
-              listContent={tribalJurisdiction}
-              label="Local/Tribal"
-              isRequired
-              name={`bo.${level}.identification.localTribal`}
-              selectedKey={boValue.identification.localTribal}
-              setFieldValue={setFieldValue}
-              isDisabled={
-                boValue.identification.type !== "38" ||
-                !!boValue.identification.state
-              }
-              isInvalid={
-                caTouched?.identification?.localTribal &&
-                !!caError?.identification?.localTribal
-              }
-              errorMessage={
-                caTouched?.identification?.localTribal &&
-                caError?.identification?.localTribal
-              }
-            />
-            <FormInput
-              label="Other local/Tribal description"
-              isRequired
-              {...getFieldProps(`bo.${level}.identification.otherTribe`)}
-              isDisabled={boValue.identification.localTribal !== "Other"}
-              isInvalid={
-                caTouched?.identification?.otherTribe &&
-                !!caError?.identification?.otherTribe
-              }
-              errorMessage={
-                caTouched?.identification?.otherTribe &&
-                caError?.identification?.otherTribe
-              }
-            />
-          </div>
-        </div>
-        <Divider className="bg-[#F5F5F5]" />
-        <div className="space-y-6 py-6">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold">
-              Identifying document image <span className="text-red-500">*</span>
-            </h2>
-            <Button
-              variant="bordered"
-              color="warning"
-              radius="full"
-              startContent={<Plus />}
-              className="text-black"
-            >
-              Add Attachment
-            </Button>
-          </div>
-          {/* <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
+        {!boValue.isExemptEntity && (
+          <>
+            <Divider className="bg-[#F5F5F5]" />
+            <div className="space-y-6 py-6">
+              <h2 className="font-semibold">Residential address:</h2>
+              <div className="grid grid-cols-2 gap-6">
+                <FormSelect
+                  listContent={sortedCountries}
+                  label="Country/Jurisdiction"
+                  isRequired
+                  name={`bo.${level}.country`}
+                  selectedKey={boValue.country}
+                  setFieldValue={setFieldValue}
+                  onBlur={handleBlur}
+                  isInvalid={caTouched?.country && !!caError?.country}
+                  errorMessage={caTouched?.country && caError?.country}
+                />
+                <FormInput
+                  label="Address (number, street, and apt. or suite no.)"
+                  isRequired
+                  {...getFieldProps(`bo.${level}.address`)}
+                  isInvalid={caTouched?.address && !!caError?.address}
+                  errorMessage={caTouched?.address && caError?.address}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-6">
+                <FormInput
+                  label="City"
+                  isRequired
+                  {...getFieldProps(`bo.${level}.city`)}
+                  isInvalid={caTouched?.city && !!caError?.city}
+                  errorMessage={caTouched?.city && caError?.city}
+                />
+                <FormSelect
+                  listContent={getStateForCountry(boValue.country)}
+                  label="State"
+                  isRequired
+                  name={`bo.${level}.state`}
+                  selectedKey={boValue.state}
+                  setFieldValue={setFieldValue}
+                  onBlur={handleBlur}
+                  isInvalid={caTouched?.state && !!caError?.state}
+                  errorMessage={caTouched?.state && caError?.state}
+                  isDisabled={!isUnitedStates && !!boValue.country}
+                />
+                <FormInput
+                  label="ZIP/Foreign postal code*"
+                  isRequired
+                  {...getFieldProps(`bo.${level}.zip`)}
+                  isInvalid={caTouched?.zip && !!caError?.zip}
+                  errorMessage={caTouched?.zip && caError?.zip}
+                />
+              </div>
+            </div>
+            <Divider className="bg-[#F5F5F5]" />
+            <div className="space-y-6 py-6">
+              <h2 className="font-semibold">
+                Form of identification and issuing jurisdiction:
+              </h2>
+              <div className="grid grid-cols-2 gap-6">
+                <FormSelect
+                  listContent={identifyingDocumentTypes}
+                  label="Identifying document type"
+                  name={`bo.${level}.identification.type`}
+                  isRequired
+                  selectedKey={boValue.identification.type}
+                  setFieldValue={setFieldValue}
+                  onBlur={handleBlur}
+                  isInvalid={
+                    caTouched?.identification?.type &&
+                    !!caError?.identification?.type
+                  }
+                  errorMessage={
+                    caTouched?.identification?.type &&
+                    caError?.identification?.type
+                  }
+                />
+                <FormInput
+                  label="Identifying document number"
+                  isRequired
+                  {...getFieldProps(`bo.${level}.identification.id`)}
+                  isInvalid={
+                    caTouched?.identification?.id &&
+                    !!caError?.identification?.id
+                  }
+                  errorMessage={
+                    caTouched?.identification?.id && caError?.identification?.id
+                  }
+                />
+              </div>{" "}
+              <h2 className="font-semibold">
+                Identifying document issuing jurisdiction{" "}
+                <span className="text-red-500">*</span>
+              </h2>
+              <div className="grid grid-cols-2 gap-6">
+                <FormSelect
+                  listContent={getCountryForJurisdiction()}
+                  label="Country/Jurisdiction"
+                  isRequired
+                  name={`bo.${level}.identification.jurisdiction`}
+                  selectedKey={boValue.identification.jurisdiction}
+                  setFieldValue={setFieldValue}
+                  isInvalid={
+                    caTouched?.identification?.jurisdiction &&
+                    !!caError?.identification?.jurisdiction
+                  }
+                  errorMessage={
+                    caTouched?.identification?.jurisdiction &&
+                    caError?.identification?.jurisdiction
+                  }
+                  isDisabled={
+                    boValue.identification.jurisdiction === "US" &&
+                    boValue.identification.type === "39"
+                  }
+                />
+                <FormSelect
+                  listContent={getStateForCountry(
+                    boValue.identification.jurisdiction,
+                  )}
+                  label="State"
+                  isRequired
+                  name={`bo.${level}.identification.state`}
+                  selectedKey={boValue.identification.state}
+                  setFieldValue={setFieldValue}
+                  isDisabled={
+                    (!!boValue.identification.jurisdiction &&
+                      !["37", "38"].includes(boValue.identification.type)) ||
+                    !!boValue.identification.localTribal ||
+                    (isPriorityJurisdiction &&
+                      boValue.identification.jurisdiction !== "US")
+                  }
+                  isInvalid={
+                    caTouched?.identification?.state &&
+                    !!caError?.identification?.state
+                  }
+                  errorMessage={
+                    caTouched?.identification?.state &&
+                    caError?.identification?.state
+                  }
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-6">
+                <FormSelect
+                  listContent={tribalJurisdiction}
+                  label="Local/Tribal"
+                  isRequired
+                  name={`bo.${level}.identification.localTribal`}
+                  selectedKey={boValue.identification.localTribal}
+                  setFieldValue={setFieldValue}
+                  isDisabled={
+                    boValue.identification.type !== "38" ||
+                    !!boValue.identification.state
+                  }
+                  isInvalid={
+                    caTouched?.identification?.localTribal &&
+                    !!caError?.identification?.localTribal
+                  }
+                  errorMessage={
+                    caTouched?.identification?.localTribal &&
+                    caError?.identification?.localTribal
+                  }
+                />
+                <FormInput
+                  label="Other local/Tribal description"
+                  isRequired
+                  {...getFieldProps(`bo.${level}.identification.otherTribe`)}
+                  isDisabled={boValue.identification.localTribal !== "Other"}
+                  isInvalid={
+                    caTouched?.identification?.otherTribe &&
+                    !!caError?.identification?.otherTribe
+                  }
+                  errorMessage={
+                    caTouched?.identification?.otherTribe &&
+                    caError?.identification?.otherTribe
+                  }
+                />
+              </div>
+            </div>
+            <Divider className="bg-[#F5F5F5]" />
+            <div className="space-y-6 py-6">
+              <div className="flex items-center justify-between">
+                <h2 className="font-semibold">
+                  Identifying document image{" "}
+                  <span className="text-red-500">*</span>
+                </h2>
+                <Button
+                  variant="bordered"
+                  color="warning"
+                  radius="full"
+                  startContent={<Plus />}
+                  className="text-black"
+                >
+                  Add Attachment
+                </Button>
+              </div>
+              {/* <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
             <div className="flex w-fit gap-4">
               <Avatar
                 src={"/pdf-logo.png"}
@@ -511,7 +526,9 @@ const SectionForm = ({
               <Trash2 className="text-red-500" />
             </Button>
           </div> */}
-        </div>
+            </div>
+          </>
+        )}
       </AccordionItem>
     </Accordion>
   );
