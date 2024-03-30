@@ -34,18 +34,18 @@ const FormStep1 = ({
     }
   }, [fiValue.taxType]);
 
-  useEffect(() => {
-    if (["INITIAL", "NEW_EXEMPT"].includes(fiValue.filingType)) {
-      ["legalName", "taxType", "taxId", "taxJurisdiction"].forEach((field) => {
-        resetValueOnDiff(field as keyof typeof fiValue);
-        formData.setFieldTouched(`fi[${field}]`, false);
-        formData.setFieldError(`fi[${field}]`, "");
-      });
-    }
-    // if (fiValue.filingType === "NEW_EXEMPT") {
-    //   formData.setFieldValue("fi.filingType", "NEW_EXEMPT");
-    // }
-  }, [fiValue.filingType]);
+  // useEffect(() => {
+  //   if (["INITIAL", "NEW_EXEMPT"].includes(fiValue.filingType)) {
+  //     ["legalName", "taxType", "taxId", "taxJurisdiction"].forEach((field) => {
+  //       resetValueOnDiff(field as keyof typeof fiValue);
+  //       formData.setFieldTouched(`fi[${field}]`, false);
+  //       formData.setFieldError(`fi[${field}]`, "");
+  //     });
+  //   }
+  //   if (fiValue.filingType === "NEW_EXEMPT") {
+  //     formData.setFieldValue("fi.filingType", "NEW_EXEMPT");
+  //   }
+  // }, [fiValue.filingType]);
 
   return (
     <form onSubmit={formData.handleSubmit}>
@@ -88,7 +88,19 @@ const FormStep1 = ({
               { label: "d. Newly exempt entity", value: "NEW_EXEMPT" },
             ]}
             selectedValue={fiValue.filingType}
-            setFieldValue={formData.setFieldValue}
+            setFieldValue={(field, value) => {
+              if (["INITIAL", "NEW_EXEMPT"].includes(value)) {
+                ["legalName", "taxType", "taxId", "taxJurisdiction"].forEach(
+                  (field) => {
+                    resetValueOnDiff(field as keyof typeof fiValue);
+                    formData.setFieldTouched(`fi[${field}]`, false);
+                    formData.setFieldError(`fi[${field}]`, "");
+                  },
+                );
+              }
+
+              return formData.setFieldValue(field, value);
+            }}
             onBlur={formData.handleBlur}
             isInvalid={fiTouched?.filingType && !!fiError?.filingType}
             errorMessage={fiTouched?.filingType && fiError?.filingType}
