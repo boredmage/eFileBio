@@ -22,7 +22,7 @@ import { FormikErrors, FormikProps } from "formik";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { caFormShape } from "./form-shape";
-import { iFormType } from "./page";
+import { iFormType } from "./form";
 import { caFormInterface } from "@/types";
 
 const FormStep3 = ({ formData }: { formData: FormikProps<iFormType> }) => {

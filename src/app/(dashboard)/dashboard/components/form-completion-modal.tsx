@@ -9,14 +9,17 @@ import {
   Avatar,
 } from "@nextui-org/react";
 import { X } from "lucide-react";
+import { Business } from "@prisma/client";
 
 export default function FormCompletionModal({
-  businessLogo,
   isOpen,
+  business,
+  formVersion,
   onOpenChange,
 }: {
   isOpen: boolean;
-  businessLogo: string;
+  business: Business;
+  formVersion: number;
   onOpenChange: () => void;
 }) {
   return (
@@ -35,16 +38,12 @@ export default function FormCompletionModal({
               <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
                 <div className="flex w-fit gap-4">
                   <Avatar
-                    src={businessLogo}
+                    src={business.logo ?? ""}
                     className="mx-auto !block h-12 w-12 !rounded-md !bg-transparent text-large"
                   />
                   <div>
-                    <h2 className="text-xl font-semibold">
-                      New Business eFiling
-                    </h2>
-                    <p className="text-sm">
-                      Create a New Business to manage eFiling
-                    </p>
+                    <h2 className="text-xl font-semibold">{business.name}</h2>
+                    <p className="text-sm">BOIR Version {formVersion}</p>
                   </div>
                 </div>
                 <Button

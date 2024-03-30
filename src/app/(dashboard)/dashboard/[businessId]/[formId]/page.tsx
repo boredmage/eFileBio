@@ -1,211 +1,63 @@
-"use client";
+import { Suspense } from "react";
+import Form from "./form";
+import Loading from "./loading";
+import { prisma } from "@/lib/db";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
+import { redirect } from "next/navigation";
+import { Business, Form as FormType } from "@prisma/client";
 
-import { Avatar, Button, Progress, useDisclosure } from "@nextui-org/react";
-import { useEffect, useState } from "react";
-import FormTab from "../../components/form-tab";
-import FormSteps from "./form-steps";
-import { FormikProps, useFormik } from "formik";
-import { fiFormInterface, rcFormInterface, caFormInterface } from "@/types";
-import { formValidation } from "@/utils/validations";
-import {
-  boFormShape,
-  caFormShape,
-  fiFormShape,
-  rcFormShape,
-} from "./form-shape";
-import { ArrowLeft, MoveRight } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { boFormInterface } from "@/types/form-types";
-import FormCompletionModal from "../../components/form-completion-modal";
-
-export type iFormType = {
-  fi: fiFormInterface;
-  rc: rcFormInterface;
-  ca: caFormInterface[];
-  bo: boFormInterface[];
-};
-
-const Form = () => {
-  const router = useRouter();
-  const { businessId, formId } = useParams();
-  const [activeTab, setActiveTab] = useState(0);
-  const [businessLogo, setBusinessLogo] = useState("");
-  const [datePrepared, setDatePrepared] = useState(new Date());
-  const {
-    isOpen: modalIsOpen,
-    onOpen: fileOpenHandler,
-    onOpenChange: modalOpenChangeHandler,
-  } = useDisclosure();
-
-  const formData = useFormik<iFormType>({
-    initialValues: {
-      fi: fiFormShape,
-      rc: rcFormShape,
-      ca: [caFormShape],
-      bo: [boFormShape],
+async function getFormData(
+  businessId: string,
+  formId: string,
+  ownerId: string,
+) {
+  const formData = await prisma.form.findUnique({
+    where: {
+      id: formId,
+      business: {
+        ownerId,
+        id: businessId,
+      },
     },
-    validationSchema: formValidation,
-    onSubmit: (values) => {
-      console.log(JSON.stringify(values, null, 2));
+    include: {
+      business: true,
     },
   });
 
-  useEffect(() => {
-    if (businessId && formId) {
-      const savedData = localStorage.getItem(
-        (businessId as string).concat(formId as string),
-      );
+  return formData;
+}
 
-      if (savedData) {
-        formData.setValues(JSON.parse(savedData));
-      }
-    }
+const page = async ({
+  params,
+}: {
+  params: { businessId: string; formId: string };
+}) => {
+  const { businessId, formId } = params;
+  const session = await getServerSession(authOptions);
 
-    async function getFormData() {
-      try {
-        const response = await fetch(
-          `/api/business/form?businessId=${businessId}&formId=${formId}`,
-        );
-        const data = await response.json();
-        const { business, updatedAt } = data;
+  const user = await prisma.user.findUnique({
+    where: { email: session?.user?.email as string },
+  });
 
-        setDatePrepared(new Date(updatedAt));
-        // console.log(data);
+  if (!user || !user.id) {
+    return redirect("/");
+  }
 
-        setBusinessLogo(business.logo);
-      } catch (error) {
-        console.error(error);
-      }
-    }
+  const formData = await getFormData(businessId, formId, user.id);
 
-    getFormData();
-  }, []);
+  if (!formData) {
+    return redirect("/dashboard");
+  }
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      console.log("Saving...");
-      localStorage.setItem(
-        (businessId as string).concat(formId as string),
-        JSON.stringify(formData.values),
-      );
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, [formData.values]);
-
-  const handleNext = () => {
-    if (
-      activeTab === 3 &&
-      !formData.errors.bo &&
-      !formData.errors.ca &&
-      !formData.errors.fi &&
-      !formData.errors.rc
-    ) {
-      fileOpenHandler();
-    } else {
-      formData.handleSubmit();
-    }
-
-    if (activeTab === 0 && !formData.errors.fi) {
-      setActiveTab((currentIndex) => currentIndex + 1);
-      formData.setErrors({});
-      formData.setTouched({});
-    } else if (activeTab === 1 && !formData.errors.rc) {
-      setActiveTab((currentIndex) => currentIndex + 1);
-      formData.setErrors({});
-      formData.setTouched({});
-    } else if (activeTab === 2 && !formData.errors.ca) {
-      setActiveTab((currentIndex) => currentIndex + 1);
-      formData.setErrors({});
-      formData.setTouched({});
-    }
-  };
-  const handleBack = () => setActiveTab((currentIndex) => currentIndex - 1);
+  const form: FormType = formData;
+  const business: Business = formData.business;
 
   return (
-    <div className="flex h-full flex-col">
-      <FormTab activeTab={activeTab} setActiveTab={setActiveTab} />
-
-      <div className="flex flex-1 flex-col rounded-b-2xl bg-white p-4">
-        <div className="space-y-4">
-          <Progress
-            color="warning"
-            aria-label="Loading..."
-            value={(activeTab + 1) * 25}
-          />
-          <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
-            <div className="flex w-fit gap-4">
-              <Avatar
-                src={businessLogo}
-                className="mx-auto !block h-12 w-12 !rounded-md !bg-transparent text-large"
-              />
-              <div>
-                <h2 className="text-xl font-semibold">New Business eFiling</h2>
-                <p className="text-sm">
-                  Create a New Business to manage eFiling
-                </p>
-              </div>
-            </div>
-            <Button
-              isIconOnly
-              aria-label="Like"
-              variant="flat"
-              className="h-12 w-12"
-              onClick={() => router.back()}
-            >
-              <ArrowLeft />
-            </Button>
-          </div>
-        </div>
-        <div className="flex-grow">
-          {activeTab === 0 && (
-            <FormSteps.FormStep1
-              formData={formData as FormikProps<iFormType>}
-              datePrepared={datePrepared}
-            />
-          )}
-          {activeTab === 1 && (
-            <FormSteps.FormStep2
-              formData={formData as FormikProps<iFormType>}
-            />
-          )}
-          {activeTab === 2 && (
-            <FormSteps.FormStep3
-              formData={formData as FormikProps<iFormType>}
-            />
-          )}
-          {activeTab === 3 && (
-            <FormSteps.FormStep4
-              formData={formData as FormikProps<iFormType>}
-            />
-          )}
-        </div>
-        <div className="mt-4 flex items-center justify-end gap-4">
-          <Button
-            radius="full"
-            onClick={handleBack}
-            isDisabled={activeTab === 0}
-          >
-            Back
-          </Button>
-          <Button
-            radius="full"
-            color="warning"
-            endContent={<MoveRight />}
-            className="text-white"
-            onClick={handleNext}
-          >
-            {activeTab === 3 ? "File BOIR" : "Next"}
-          </Button>
-          <FormCompletionModal
-            isOpen={modalIsOpen}
-            businessLogo={businessLogo}
-            onOpenChange={modalOpenChangeHandler}
-          />
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<Loading />}>
+      <Form params={params} form={form} business={business} />
+    </Suspense>
   );
 };
 
-export default Form;
+export default page;

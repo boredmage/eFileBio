@@ -1,3 +1,5 @@
+"use client";
+
 import clsx from "clsx";
 
 const tabs = [
@@ -12,14 +14,14 @@ const FormTab = ({
   setActiveTab,
 }: {
   activeTab: number;
-  setActiveTab: (index: number) => void;
+  setActiveTab?: (index: number) => void;
 }) => {
   return (
     <ul className="w-fit rounded-2xl bg-[#E5E5E5] before:table after:clear-both after:table after:overflow-hidden">
       {tabs.map((tab, index) => (
         <li
           key={index}
-          onClick={() => setActiveTab(index)}
+          onClick={() => setActiveTab && setActiveTab(index)}
           className={clsx(
             "relative float-left cursor-pointer before:absolute before:-left-3 before:bottom-0 before:h-3 before:w-3 after:absolute after:-right-3 after:bottom-0 after:h-3 after:w-3",
             activeTab === index

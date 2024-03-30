@@ -15,7 +15,7 @@ import { Button, Checkbox, Divider } from "@nextui-org/react";
 import { FormikProps } from "formik";
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
-import { iFormType } from "./page";
+import { iFormType } from "./form";
 
 const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
   const {

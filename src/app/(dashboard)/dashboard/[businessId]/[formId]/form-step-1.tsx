@@ -7,7 +7,7 @@ import { foreignCountries, taxIdentificationTypes } from "@/utils/constants";
 import { Divider } from "@nextui-org/react";
 import { FormikProps } from "formik";
 import { useEffect } from "react";
-import { iFormType } from "./page";
+import { iFormType } from "./form";
 
 const FormStep1 = ({
   formData,

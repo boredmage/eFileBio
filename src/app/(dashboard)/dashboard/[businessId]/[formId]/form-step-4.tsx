@@ -23,7 +23,7 @@ import { FormikErrors, FormikProps } from "formik";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { boFormShape } from "./form-shape";
-import { iFormType } from "./page";
+import { iFormType } from "./form";
 import { boFormInterface } from "@/types";
 
 const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
