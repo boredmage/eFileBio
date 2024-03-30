@@ -65,6 +65,9 @@ dependencies:
   react-dom:
     specifier: ^18
     version: 18.2.0(react@18.2.0)
+  stripe:
+    specifier: ^14.23.0
+    version: 14.23.0
   tailwind-merge:
     specifier: ^2.2.2
     version: 2.2.2
@@ -3302,7 +3305,6 @@ packages:
       }
     dependencies:
       undici-types: 5.26.5
-    dev: true
 
   /@types/nprogress@0.2.3:
     resolution:
@@ -3891,7 +3893,6 @@ packages:
       function-bind: 1.1.2
       get-intrinsic: 1.2.4
       set-function-length: 1.2.2
-    dev: true
 
   /callsites@3.1.0:
     resolution:
@@ -4215,7 +4216,6 @@ packages:
       es-define-property: 1.0.0
       es-errors: 1.3.0
       gopd: 1.0.1
-    dev: true
 
   /define-properties@1.2.1:
     resolution:
@@ -4433,7 +4433,6 @@ packages:
     engines: { node: ">= 0.4" }
     dependencies:
       get-intrinsic: 1.2.4
-    dev: true
 
   /es-errors@1.3.0:
     resolution:
@@ -4441,7 +4440,6 @@ packages:
         integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==,
       }
     engines: { node: ">= 0.4" }
-    dev: true
 
   /es-iterator-helpers@1.0.17:
     resolution:
@@ -5115,7 +5113,6 @@ packages:
       has-proto: 1.0.3
       has-symbols: 1.0.3
       hasown: 2.0.2
-    dev: true
 
   /get-nonce@1.0.1:
     resolution:
@@ -5242,7 +5239,6 @@ packages:
       }
     dependencies:
       get-intrinsic: 1.2.4
-    dev: true
 
   /graceful-fs@4.2.11:
     resolution:
@@ -5279,7 +5275,6 @@ packages:
       }
     dependencies:
       es-define-property: 1.0.0
-    dev: true
 
   /has-proto@1.0.3:
     resolution:
@@ -5287,7 +5282,6 @@ packages:
         integrity: sha512-SJ1amZAJUiZS+PhsVLf5tGydlaVB8EdFpaSO4gmiUKUOxk8qzn5AIy4ZeJUmh22znIdk/uMAUT2pl3FxzVUH+Q==,
       }
     engines: { node: ">= 0.4" }
-    dev: true
 
   /has-symbols@1.0.3:
     resolution:
@@ -5295,7 +5289,6 @@ packages:
         integrity: sha512-l3LCuF6MgDNwTDKkdYGEihYjt5pRPbEg46rtlmnSPlUbgmB8LOIrKJbYYFBSbnPaJexMKtiPO8hmeRjRz2Td+A==,
       }
     engines: { node: ">= 0.4" }
-    dev: true
 
   /has-tostringtag@1.0.2:
     resolution:
@@ -6319,7 +6312,6 @@ packages:
       {
         integrity: sha512-5qoj1RUiKOMsCCNLV1CBiPYE10sziTsnmNxkAI/rZhiD63CF7IqdFGC/XzjWjpSgLf0LxXX3bDFIh0E18f6UhQ==,
       }
-    dev: true
 
   /object-keys@1.1.1:
     resolution:
@@ -6834,6 +6826,16 @@ packages:
     engines: { node: ">=0.6.0", teleport: ">=0.2.0" }
     dev: false
 
+  /qs@6.12.0:
+    resolution:
+      {
+        integrity: sha512-trVZiI6RMOkO476zLGaBIzszOdFPnCCXHPG9kn0yuS1uz6xdVxPfZdB3vUig9pxPFDM9BRAgz/YUIVQ1/vuiUg==,
+      }
+    engines: { node: ">=0.6" }
+    dependencies:
+      side-channel: 1.0.6
+    dev: false
+
   /queue-microtask@1.2.3:
     resolution:
       {
@@ -7175,7 +7177,6 @@ packages:
       get-intrinsic: 1.2.4
       gopd: 1.0.1
       has-property-descriptors: 1.0.2
-    dev: true
 
   /set-function-name@2.0.2:
     resolution:
@@ -7217,7 +7218,6 @@ packages:
       es-errors: 1.3.0
       get-intrinsic: 1.2.4
       object-inspect: 1.13.1
-    dev: true
 
   /signal-exit@3.0.7:
     resolution:
@@ -7428,6 +7428,17 @@ packages:
       }
     engines: { node: ">=8" }
     dev: true
+
+  /stripe@14.23.0:
+    resolution:
+      {
+        integrity: sha512-OPD7LqBmni6uDdqA05GGgMZyyRWxJOehONBNC9tYgY4Uh089EtXd6QLIgRGrqTDlQH3cA2BXo848nxwa/zsQzw==,
+      }
+    engines: { node: ">=12.*" }
+    dependencies:
+      "@types/node": 20.11.25
+      qs: 6.12.0
+    dev: false
 
   /styled-jsx@5.1.1(react@18.2.0):
     resolution:
@@ -7772,7 +7783,6 @@ packages:
       {
         integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==,
       }
-    dev: true
 
   /update-browserslist-db@1.0.13(browserslist@4.23.0):
     resolution:

@@ -186,8 +186,9 @@ const Form = ({
             {activeTab === 3 ? "File BOIR" : "Next"}
           </Button>
           <FormCompletionModal
-            isOpen={modalIsOpen}
+            formId={formId}
             business={business}
+            isOpen={modalIsOpen}
             formVersion={form.version}
             onOpenChange={modalOpenChangeHandler}
           />

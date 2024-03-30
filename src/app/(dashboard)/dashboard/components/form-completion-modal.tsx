@@ -10,13 +10,16 @@ import {
 } from "@nextui-org/react";
 import { X } from "lucide-react";
 import { Business } from "@prisma/client";
+import { createCheckoutSession } from "@/lib/stripe";
 
 export default function FormCompletionModal({
+  formId,
   isOpen,
   business,
   formVersion,
   onOpenChange,
 }: {
+  formId: string;
   isOpen: boolean;
   business: Business;
   formVersion: number;
@@ -74,6 +77,16 @@ export default function FormCompletionModal({
                 radius="full"
                 className="text-[#737373]"
                 size="lg"
+                onClick={() =>
+                  createCheckoutSession(
+                    business.id,
+                    formId,
+                    "review-filling",
+                  ).then((res) => {
+                    // @ts-ignore
+                    window.location.href = res.url;
+                  })
+                }
               >
                 Expert Review before Filing
               </Button>
@@ -82,6 +95,16 @@ export default function FormCompletionModal({
                 radius="full"
                 className="text-white"
                 size="lg"
+                onClick={() =>
+                  createCheckoutSession(
+                    business.id,
+                    formId,
+                    "direct-filling",
+                  ).then((res) => {
+                    // @ts-ignore
+                    window.location.href = res.url;
+                  })
+                }
               >
                 Pay with Stripe and File Now
               </Button>

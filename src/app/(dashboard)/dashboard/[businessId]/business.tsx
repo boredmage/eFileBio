@@ -80,6 +80,7 @@ const Business = async ({ params }: { params: { businessId: string } }) => {
               businessId={businessId}
               version={form.version}
               updatedAt={form.updatedAt}
+              status={form.status}
             />
           ))}
         </div>

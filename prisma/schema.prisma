@@ -73,31 +73,40 @@ enum FillingType {
   NEW_EXEMPT
 }
 
-model Form {
-  id         String       @id @default(cuid())
-  version    Int          @default(autoincrement())
-  createdAt  DateTime     @default(now())
-  updatedAt  DateTime     @updatedAt
-  business   Business     @relation(fields: [businessId], references: [id])
-  businessId String
-  filingType FillingType?
-  fi         FormStep1?
-  rc         FormStep2?
+enum FillingStatus {
+  DRAFT
+  INREVIEW
+  SUBMITTED
+  APPROVED
+  REJECTED
 }
 
-model FormStep1 {
-  id              String   @id @default(cuid())
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  form            Form     @relation(fields: [formId], references: [id])
-  formId          String   @unique
+model Form {
+  id         String        @id @default(cuid())
+  version    Int           @default(autoincrement())
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  business   Business      @relation(fields: [businessId], references: [id])
+  businessId String
+  status     FillingStatus @default(DRAFT)
+  fi         FiForm?
+  rc         RcForm?
+}
+
+model FiForm {
+  id              String      @id @default(cuid())
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  form            Form        @relation(fields: [formId], references: [id])
+  formId          String      @unique
+  fillingType     FillingType
   legalName       String
   taxType         String
   taxId           String
   taxJurisdiction String
 }
 
-model FormStep2 {
+model RcForm {
   id                               String   @id @default(cuid())
   createdAt                        DateTime @default(now())
   updatedAt                        DateTime @updatedAt

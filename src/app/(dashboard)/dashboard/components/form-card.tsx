@@ -10,28 +10,39 @@ import {
   DropdownItem,
   Button,
   cn,
+  Chip,
 } from "@nextui-org/react";
 import { EllipsisVertical } from "lucide-react";
+
+const chipColor = {
+  DRAFT: "warning",
+  INREVIEW: "secondary",
+  SUBMITTED: "primary",
+  APPROVED: "success",
+  REJECTED: "danger",
+} as const;
 
 const FormCard = ({
   version,
   updatedAt,
   businessId,
   formId,
+  status,
 }: {
   version: number;
   updatedAt: Date;
   businessId: string;
   formId: string;
+  status: string;
 }) => {
   return (
     <div className="relative">
       <FormMenu />
       <Link
-        className="block cursor-pointer space-y-8 rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] px-5 py-8"
+        className="block cursor-pointer space-y-5 rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] px-5 py-8"
         href={`/dashboard/${businessId}/${formId}`}
       >
-        <Icons.SystemUpdate className="mx-auto !block h-20 w-20 !rounded-md !bg-transparent text-large" />
+        <Icons.SystemUpdate className="mx-auto mt-3 !block h-20 w-20 !rounded-md !bg-transparent text-large" />
 
         <div className="space-y-2 text-center">
           <h2 className="text-xl font-semibold">BOIR Version {version}</h2>
@@ -47,6 +58,22 @@ const FormCard = ({
               .join(" / ")}
           </p>
         </div>
+        {/* <div
+          className={cn("rounded-md px-3 py-1 text-center text-sm text-white", {
+            "bg-[#FFC107]": status.toLowerCase() === "draft",
+            "bg-[#4CAF50]": status.toLowerCase() === "submitted",
+            "bg-[#F44336]": status.toLowerCase() === "rejected",
+          })}
+        >
+          {status}
+        </div> */}
+        <Chip
+          color={chipColor[status as keyof typeof chipColor]}
+          variant="dot"
+          className="absolute left-4 top-2 !mt-2 border-[0.5px] text-xs"
+        >
+          {status}
+        </Chip>
       </Link>
     </div>
   );
