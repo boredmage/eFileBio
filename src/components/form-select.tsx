@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   Autocomplete,
   AutocompleteItem,
@@ -9,6 +10,7 @@ const FormSelect = ({
   setFieldValue,
   placeholder = "Select",
   listContent,
+  className,
   ...props
 }: Omit<AutocompleteProps, "children"> & {
   listContent: {
@@ -18,7 +20,7 @@ const FormSelect = ({
   setFieldValue?: (field: string, value: typeof props.value) => void;
 }) => {
   return (
-    <div className="relative">
+    <div className={cn("relative", className)}>
       <Autocomplete
         label={<span className="text-sm text-[#404040]">{label}</span>}
         placeholder={placeholder}

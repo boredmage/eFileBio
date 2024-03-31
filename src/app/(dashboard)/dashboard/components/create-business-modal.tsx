@@ -1,7 +1,11 @@
 "use client";
 
+import FormDate from "@/components/form-date";
+import FormInput from "@/components/form-input";
+import FormSelect from "@/components/form-select";
 import { createBusiness } from "@/lib/actions";
-import { UploadButton } from "@/utils/uploadthing";
+import { cn } from "@/lib/utils";
+import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
 import {
   Avatar,
   Button,
@@ -11,9 +15,12 @@ import {
   ModalContent,
   ModalFooter,
   ModalHeader,
+  Spinner,
   useDisclosure,
 } from "@nextui-org/react";
+import { useFormik } from "formik";
 import { Add } from "iconsax-react";
+import { X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { ClientUploadedFileData } from "uploadthing/types";
@@ -25,32 +32,40 @@ const initialState = {
 };
 
 export function CreateBusinessModal() {
-  const logoUrlRef = useRef<HTMLInputElement>(null);
-  const [businessLogo, setBusinessLogo] = useState("");
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [state, formAction] = useFormState<any, any>(
-    createBusiness,
-    initialState,
-  );
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
-  useEffect(() => {
-    if (state.created) {
-      onOpenChange();
-      setBusinessLogo("");
-    }
-  }, [state.created, state.business?.id]);
+  const businessCreationInfo = useFormik({
+    initialValues: {
+      businessName: "",
+      businessLogo: "",
+      businessDescription: "",
+      businessCreationDate: "",
+      businessEntityType: "",
+    },
+    onSubmit: async (values) => {
+      const { business, errors } = await createBusiness({
+        name: values.businessName,
+        logo: values.businessLogo,
+        description: values.businessDescription,
+        creationDate: values.businessCreationDate,
+        entityType: values.businessEntityType,
+      });
 
-  // useEffect(() => {
-  //   console.log(state);
-  // }, [state]);
+      if (errors) {
+        console.log(errors);
+      } else {
+        businessCreationInfo.resetForm();
+        console.log(business);
+        onOpenChange();
+      }
+    },
+  });
 
   const handleClientUploadComplete = (res: ClientUploadedFileData<null>[]) => {
     const logoURL = res[0].url;
-
-    if (logoUrlRef && logoUrlRef.current) {
-      setBusinessLogo(logoURL);
-      logoUrlRef.current.value = logoURL;
-    }
+    businessCreationInfo.setFieldValue("businessLogo", logoURL);
+    setIsUploadingLogo(false);
   };
 
   return (
@@ -76,72 +91,109 @@ export function CreateBusinessModal() {
         isDismissable={false}
         isKeyboardDismissDisabled={true}
         size="lg"
+        backdrop="blur"
       >
         <ModalContent>
           {(onClose) => (
-            <form action={formAction}>
+            <form onSubmit={businessCreationInfo.handleSubmit}>
               <ModalHeader className="flex flex-col gap-1">
                 Create a Business
               </ModalHeader>
-              <ModalBody className="space-y-10">
+              <ModalBody className="space-y-2">
                 <span>Business Logo</span>
-                <input type="hidden" name="logoUrl" ref={logoUrlRef} />
-                <div className="!mt-0 flex items-center gap-5">
-                  <Avatar
-                    src={businessLogo}
-                    className="h-20 w-20 !rounded-md !bg-transparent text-large"
-                  />
-                  <UploadButton
-                    endpoint="imageUploader"
-                    onClientUploadComplete={handleClientUploadComplete}
-                    onUploadError={(error: Error) => {
-                      alert(`ERROR! ${error.message}`);
-                    }}
-                    className="w-fit items-center"
-                  />
+                <div className="relative !mt-0 flex items-center gap-5">
+                  {businessCreationInfo.values.businessLogo ? (
+                    <div className="group relative">
+                      <div
+                        className={cn(
+                          "absolute -right-2 -top-2 z-50 cursor-pointer rounded-full bg-red-500 p-1 text-white opacity-0 transition-opacity group-hover:opacity-100",
+                        )}
+                        onClick={() => {
+                          businessCreationInfo.setFieldValue(
+                            "businessLogo",
+                            "",
+                          );
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </div>
+                      <Avatar
+                        src={businessCreationInfo.values.businessLogo}
+                        className="h-20 w-20 !rounded-md !bg-transparent text-large"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative">
+                      <UploadDropzone
+                        endpoint="imageUploader"
+                        config={{ mode: "auto" }}
+                        onClientUploadComplete={handleClientUploadComplete}
+                        onUploadError={(error: Error) => {
+                          alert(`ERROR! ${error.message}`);
+                        }}
+                        onUploadBegin={() => setIsUploadingLogo(true)}
+                        className="peer mt-0 h-20 w-20 cursor-pointer ut-label:hidden ut-uploading:animate-pulse"
+                      />
+                      <Spinner
+                        className={cn(
+                          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform",
+                          { hidden: !isUploadingLogo },
+                        )}
+                        size="sm"
+                      />
+                    </div>
+                  )}
                 </div>
-
-                <Input
-                  type="text"
+                <FormInput
                   label="Business Name"
                   placeholder="Enter business name"
-                  labelPlacement="outside"
-                  variant="flat"
-                  size="lg"
-                  radius="sm"
-                  name="businessName"
+                  {...businessCreationInfo.getFieldProps("businessName")}
                 />
-                <Input
-                  type="text"
+                <FormInput
                   label="Business description"
                   placeholder="Enter business info"
-                  labelPlacement="outside"
-                  variant="flat"
-                  size="lg"
-                  radius="sm"
-                  name="businessDescription"
+                  {...businessCreationInfo.getFieldProps("businessDescription")}
+                />
+                <div>
+                  <FormDate
+                    label="Business Creation Date"
+                    placeholder="01/01/2024"
+                    isRequired
+                    setFieldValue={businessCreationInfo.setFieldValue}
+                    {...businessCreationInfo.getFieldProps(
+                      "businessCreationDate",
+                    )}
+                    // isInvalid={caTouched?.dob && !!caError?.dob}
+                    // errorMessage={caTouched?.dob && caError?.dob}
+                  />
+                </div>
+                <FormSelect
+                  label="Business entity type"
+                  setFieldValue={() => {}}
+                  listContent={[
+                    {
+                      label: "Other",
+                      value: "other",
+                    },
+                  ]}
                 />
               </ModalBody>
               <ModalFooter>
                 <Button color="danger" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Submit />
+                <Button
+                  color="primary"
+                  type="submit"
+                  isLoading={businessCreationInfo.isSubmitting}
+                >
+                  Create Business
+                </Button>
               </ModalFooter>
             </form>
           )}
         </ModalContent>
       </Modal>
     </>
-  );
-}
-
-function Submit() {
-  const { pending } = useFormStatus();
-
-  return (
-    <Button color="primary" type="submit" isLoading={pending}>
-      Create Business
-    </Button>
   );
 }

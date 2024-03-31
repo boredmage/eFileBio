@@ -19,7 +19,14 @@ const BusinessSchema = z.object({
   logo: z.string(),
 });
 
-export async function createBusiness(_prevState: any, formData: FormData) {
+export async function createBusiness(business: {
+  name: string;
+  logo: string;
+  description: string;
+  creationDate: string;
+  entityType: string;
+}) {
+  await new Promise((resolve) => setTimeout(resolve, 3000));
   try {
     const session = await getServerSession(authOptions);
 
@@ -30,9 +37,9 @@ export async function createBusiness(_prevState: any, formData: FormData) {
     }
 
     const businessFormData = BusinessSchema.safeParse({
-      logo: formData.get("logoUrl"),
-      name: formData.get("businessName"),
-      description: formData.get("businessDescription"),
+      logo: business.logo,
+      name: business.name,
+      description: business.description,
     });
 
     const user = await prisma.user.findUnique({

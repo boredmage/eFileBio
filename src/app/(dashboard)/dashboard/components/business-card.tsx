@@ -5,7 +5,7 @@ import Link from "next/link";
 const BusinessCard = ({ business }: { business: Business }) => {
   return (
     <Link
-      className="cursor-pointer space-y-8 rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] px-5 py-8"
+      className="cursor-pointer space-y-4 rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] px-5 py-8"
       href={`/dashboard/${business.id}`}
     >
       <Avatar
