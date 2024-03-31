@@ -5,8 +5,11 @@ const FormInput = ({
   label,
   type = "text",
   placeholder = "Type here",
+  innerRef,
   ...props
-}: InputProps) => {
+}: InputProps & {
+  innerRef?: React.RefObject<HTMLInputElement>;
+}) => {
   return (
     <div className={cn("flex-1", props.className)}>
       <Input
@@ -19,6 +22,7 @@ const FormInput = ({
         classNames={{
           input: "text-sm",
         }}
+        ref={innerRef}
         {...props}
       />
     </div>

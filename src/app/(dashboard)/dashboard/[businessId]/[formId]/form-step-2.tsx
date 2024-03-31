@@ -16,6 +16,7 @@ import { FormikProps } from "formik";
 import { Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { iFormType } from "./form";
+import TaxIdFormInput from "@/components/taxId-form-input";
 
 const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
   const {
@@ -51,12 +52,6 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
       rcValue.alternateNames.length > 0 ? rcValue.alternateNames.length : 1,
     );
   }, []);
-
-  useEffect(() => {
-    if (rcValue.taxType !== "foreign") {
-      resetValueOnDiff("taxJurisdiction");
-    }
-  }, [rcValue.taxType]);
 
   useEffect(() => {
     const isUnitedStates = rcValue.jurisdiction === "US";
@@ -175,15 +170,25 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             name="rc.taxType"
             placeholder="Select an ID type"
             selectedKey={rcValue.taxType}
-            setFieldValue={setFieldValue}
+            setFieldValue={(field, value) => {
+              if (value !== "foreign") {
+                resetValueOnDiff("taxJurisdiction");
+              }
+              resetValueOnDiff("taxId");
+              return setFieldValue(field, value);
+            }}
             onBlur={handleBlur}
             isInvalid={rcTouched?.taxType && !!rcError?.taxType}
             errorMessage={rcTouched?.taxType && rcError?.taxType}
             isRequired
           />
-          <FormInput
-            label="Tax Identification Number"
-            {...getFieldProps("rc.taxId")}
+          <TaxIdFormInput
+            name="rc.taxId"
+            onBlur={handleBlur}
+            taxType={rcValue.taxType}
+            value={rcValue.taxId}
+            setFieldValue={setFieldValue}
+            isDisabled={!rcValue.taxType}
             isInvalid={rcTouched?.taxId && !!rcError?.taxId}
             errorMessage={rcTouched?.taxId && rcError?.taxId}
             isRequired

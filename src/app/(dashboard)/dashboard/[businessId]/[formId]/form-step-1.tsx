@@ -8,6 +8,7 @@ import { Divider } from "@nextui-org/react";
 import { FormikProps } from "formik";
 import { useEffect } from "react";
 import { iFormType } from "./form";
+import TaxIdFormInput from "@/components/taxId-form-input";
 
 const FormStep1 = ({
   formData,
@@ -24,15 +25,9 @@ const FormStep1 = ({
 
   const resetValueOnDiff = (field: keyof typeof fiValue) => {
     setFieldValue(`fi[${field}]`, "");
+    formData.setFieldError(`fi[${field}]`, "");
+    formData.setFieldTouched(`fi[${field}]`, false);
   };
-
-  useEffect(() => {
-    if (fiValue.taxType !== "foreign") {
-      resetValueOnDiff("taxJurisdiction");
-      formData.setFieldError("fi.taxJurisdiction", "");
-      formData.setFieldTouched("fi.taxJurisdiction", false);
-    }
-  }, [fiValue.taxType]);
 
   // useEffect(() => {
   //   if (["INITIAL", "NEW_EXEMPT"].includes(fiValue.filingType)) {
@@ -144,15 +139,25 @@ const FormStep1 = ({
                 name="fi.taxType"
                 placeholder="Select an ID type"
                 selectedKey={fiValue.taxType}
-                setFieldValue={setFieldValue}
+                setFieldValue={(field, value) => {
+                  if (value !== "foreign") {
+                    resetValueOnDiff("taxJurisdiction");
+                  }
+                  resetValueOnDiff("taxId");
+                  return setFieldValue(field, value);
+                }}
                 onBlur={handleBlur}
                 isInvalid={fiTouched?.taxType && !!fiError?.taxType}
                 errorMessage={fiTouched?.taxType && fiError?.taxType}
                 isRequired
               />
-              <FormInput
-                label="Tax Identification Number"
-                {...getFieldProps("fi.taxId")}
+              <TaxIdFormInput
+                name="fi.taxId"
+                onBlur={handleBlur}
+                taxType={fiValue.taxType}
+                value={fiValue.taxId}
+                setFieldValue={setFieldValue}
+                isDisabled={!fiValue.taxType}
                 isInvalid={fiTouched?.taxId && !!fiError?.taxId}
                 errorMessage={fiTouched?.taxId && fiError?.taxId}
                 isRequired

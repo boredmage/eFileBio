@@ -7,7 +7,14 @@ const formStep2Validation = Yup.object().shape(
     taxType: Yup.mixed()
       .oneOf(["ssn", "ein", "foreign"], "Tax ID is required")
       .required("Tax type is required"),
-    taxId: Yup.string().required("Tax ID is required"),
+    taxId: Yup.string()
+      .required("Tax ID is required")
+      .test("len", "Must be exactly 9 characters", (val: any, context) => {
+        if (["ssn", "ein"].includes(context.parent.taxType)) {
+          return val && val.split("-").join("").length === 9;
+        }
+        return true;
+      }),
     taxJurisdiction: Yup.string().when("taxType", {
       is: (val: string) => val === "foreign",
       then: (schema) =>
