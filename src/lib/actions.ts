@@ -17,13 +17,15 @@ const BusinessSchema = z.object({
     }),
   description: z.string(),
   logo: z.string(),
+  entityType: z.string(),
+  creationDate: z.date(),
 });
 
 export async function createBusiness(business: {
   name: string;
   logo: string;
   description: string;
-  creationDate: string;
+  creationDate: Date;
   entityType: string;
 }) {
   await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -40,6 +42,8 @@ export async function createBusiness(business: {
       logo: business.logo,
       name: business.name,
       description: business.description,
+      entityType: business.entityType,
+      creationDate: business.creationDate,
     });
 
     const user = await prisma.user.findUnique({
@@ -60,8 +64,10 @@ export async function createBusiness(business: {
 
     const newBusiness = await prisma.business.create({
       data: {
-        logo: businessFormData.data.logo,
+        entityType: business.entityType,
         name: businessFormData.data.name,
+        logo: businessFormData.data.logo,
+        creationDate: business.creationDate,
         description: businessFormData.data.description,
         ownerId: user.id,
       },

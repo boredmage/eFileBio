@@ -23,17 +23,19 @@ const chipColor = {
 } as const;
 
 const FormCard = ({
+  formId,
+  status,
   version,
   updatedAt,
   businessId,
-  formId,
-  status,
+  businessCreationDate,
 }: {
+  formId: string;
+  status: string;
   version: number;
   updatedAt: Date;
   businessId: string;
-  formId: string;
-  status: string;
+  businessCreationDate: Date;
 }) => {
   return (
     <div className="relative">
@@ -58,15 +60,6 @@ const FormCard = ({
               .join(" / ")}
           </p>
         </div>
-        {/* <div
-          className={cn("rounded-md px-3 py-1 text-center text-sm text-white", {
-            "bg-[#FFC107]": status.toLowerCase() === "draft",
-            "bg-[#4CAF50]": status.toLowerCase() === "submitted",
-            "bg-[#F44336]": status.toLowerCase() === "rejected",
-          })}
-        >
-          {status}
-        </div> */}
         <Chip
           color={chipColor[status as keyof typeof chipColor]}
           variant="dot"

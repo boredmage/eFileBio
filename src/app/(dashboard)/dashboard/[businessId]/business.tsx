@@ -18,9 +18,10 @@ async function getBusiness(businessId: string, userId: string) {
     select: {
       id: true,
       name: true,
-      description: true,
       logo: true,
       forms: true,
+      description: true,
+      creationDate: true,
     },
   });
 
@@ -77,10 +78,11 @@ const Business = async ({ params }: { params: { businessId: string } }) => {
             <FormCard
               key={form.id}
               formId={form.id}
-              businessId={businessId}
-              version={form.version}
-              updatedAt={form.updatedAt}
               status={form.status}
+              version={form.version}
+              businessId={businessId}
+              updatedAt={form.updatedAt}
+              businessCreationDate={business.creationDate}
             />
           ))}
         </div>

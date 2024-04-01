@@ -1,6 +1,9 @@
 -- CreateEnum
 CREATE TYPE "FillingType" AS ENUM ('INITIAL', 'CORRECT', 'UPDATE', 'NEW_EXEMPT');
 
+-- CreateEnum
+CREATE TYPE "FillingStatus" AS ENUM ('DRAFT', 'INREVIEW', 'SUBMITTED', 'APPROVED', 'REJECTED');
+
 -- CreateTable
 CREATE TABLE "Account" (
     "id" TEXT NOT NULL,
@@ -56,6 +59,8 @@ CREATE TABLE "Business" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "ownerId" TEXT NOT NULL,
+    "creationDate" TIMESTAMP(3) NOT NULL,
+    "entityType" TEXT NOT NULL,
 
     CONSTRAINT "Business_pkey" PRIMARY KEY ("id")
 );
@@ -67,31 +72,34 @@ CREATE TABLE "Form" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "businessId" TEXT NOT NULL,
-    "filingType" "FillingType" NOT NULL,
+    "status" "FillingStatus" NOT NULL DEFAULT 'DRAFT',
 
     CONSTRAINT "Form_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "FormStep1" (
+CREATE TABLE "FiForm" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "formId" TEXT NOT NULL,
+    "fillingType" "FillingType" NOT NULL,
     "legalName" TEXT NOT NULL,
     "taxType" TEXT NOT NULL,
     "taxId" TEXT NOT NULL,
     "taxJurisdiction" TEXT NOT NULL,
 
-    CONSTRAINT "FormStep1_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "FiForm_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "FormStep2" (
+CREATE TABLE "RcForm" (
     "id" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "formId" TEXT NOT NULL,
+    "isForeignPooledInvestmentVehicle" BOOLEAN NOT NULL,
+    "isRequestingId" BOOLEAN NOT NULL,
     "legalName" TEXT NOT NULL,
     "alternateNames" TEXT[],
     "taxType" TEXT NOT NULL,
@@ -110,7 +118,7 @@ CREATE TABLE "FormStep2" (
     "state" TEXT NOT NULL,
     "zip" TEXT NOT NULL,
 
-    CONSTRAINT "FormStep2_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "RcForm_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -129,10 +137,10 @@ CREATE UNIQUE INDEX "VerificationToken_token_key" ON "VerificationToken"("token"
 CREATE UNIQUE INDEX "VerificationToken_identifier_token_key" ON "VerificationToken"("identifier", "token");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FormStep1_formId_key" ON "FormStep1"("formId");
+CREATE UNIQUE INDEX "FiForm_formId_key" ON "FiForm"("formId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "FormStep2_formId_key" ON "FormStep2"("formId");
+CREATE UNIQUE INDEX "RcForm_formId_key" ON "RcForm"("formId");
 
 -- AddForeignKey
 ALTER TABLE "Account" ADD CONSTRAINT "Account_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -147,7 +155,7 @@ ALTER TABLE "Business" ADD CONSTRAINT "Business_ownerId_fkey" FOREIGN KEY ("owne
 ALTER TABLE "Form" ADD CONSTRAINT "Form_businessId_fkey" FOREIGN KEY ("businessId") REFERENCES "Business"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FormStep1" ADD CONSTRAINT "FormStep1_formId_fkey" FOREIGN KEY ("formId") REFERENCES "Form"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "FiForm" ADD CONSTRAINT "FiForm_formId_fkey" FOREIGN KEY ("formId") REFERENCES "Form"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "FormStep2" ADD CONSTRAINT "FormStep2_formId_fkey" FOREIGN KEY ("formId") REFERENCES "Form"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "RcForm" ADD CONSTRAINT "RcForm_formId_fkey" FOREIGN KEY ("formId") REFERENCES "Form"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

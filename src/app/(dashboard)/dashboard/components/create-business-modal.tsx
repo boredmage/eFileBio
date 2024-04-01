@@ -5,11 +5,12 @@ import FormInput from "@/components/form-input";
 import FormSelect from "@/components/form-select";
 import { createBusiness } from "@/lib/actions";
 import { cn } from "@/lib/utils";
-import { UploadButton, UploadDropzone } from "@/utils/uploadthing";
+import { businessEntityTypes } from "@/utils/constants";
+import { UploadDropzone } from "@/utils/uploadthing";
+import { businessCreationValidation } from "@/utils/validations";
 import {
   Avatar,
   Button,
-  Input,
   Modal,
   ModalBody,
   ModalContent,
@@ -21,8 +22,7 @@ import {
 import { useFormik } from "formik";
 import { Add } from "iconsax-react";
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
+import { useEffect, useState } from "react";
 import { ClientUploadedFileData } from "uploadthing/types";
 
 const initialState = {
@@ -34,6 +34,11 @@ const initialState = {
 export function CreateBusinessModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const {
+    isOpen: excemptPromptOpen,
+    onOpen: excemptPromptOnOpen,
+    onOpenChange: excemptPromptOnOpenChange,
+  } = useDisclosure();
 
   const businessCreationInfo = useFormik({
     initialValues: {
@@ -43,13 +48,14 @@ export function CreateBusinessModal() {
       businessCreationDate: "",
       businessEntityType: "",
     },
+    validationSchema: businessCreationValidation,
     onSubmit: async (values) => {
       const { business, errors } = await createBusiness({
         name: values.businessName,
         logo: values.businessLogo,
-        description: values.businessDescription,
-        creationDate: values.businessCreationDate,
         entityType: values.businessEntityType,
+        description: values.businessDescription,
+        creationDate: new Date(values.businessCreationDate),
       });
 
       if (errors) {
@@ -61,6 +67,13 @@ export function CreateBusinessModal() {
       }
     },
   });
+
+  useEffect(() => {
+    businessCreationInfo.resetForm();
+  }, [isOpen]);
+
+  const formError = businessCreationInfo.errors;
+  const formTouched = businessCreationInfo.touched;
 
   const handleClientUploadComplete = (res: ClientUploadedFileData<null>[]) => {
     const logoURL = res[0].url;
@@ -95,7 +108,7 @@ export function CreateBusinessModal() {
       >
         <ModalContent>
           {(onClose) => (
-            <form onSubmit={businessCreationInfo.handleSubmit}>
+            <form>
               <ModalHeader className="flex flex-col gap-1">
                 Create a Business
               </ModalHeader>
@@ -130,6 +143,7 @@ export function CreateBusinessModal() {
                         onClientUploadComplete={handleClientUploadComplete}
                         onUploadError={(error: Error) => {
                           alert(`ERROR! ${error.message}`);
+                          setIsUploadingLogo(false);
                         }}
                         onUploadBegin={() => setIsUploadingLogo(true)}
                         className="peer mt-0 h-20 w-20 cursor-pointer ut-label:hidden ut-uploading:animate-pulse"
@@ -148,6 +162,13 @@ export function CreateBusinessModal() {
                   label="Business Name"
                   placeholder="Enter business name"
                   {...businessCreationInfo.getFieldProps("businessName")}
+                  isRequired
+                  isInvalid={
+                    formTouched.businessName && !!formError.businessName
+                  }
+                  errorMessage={
+                    formTouched.businessName && formError.businessName
+                  }
                 />
                 <FormInput
                   label="Business description"
@@ -156,41 +177,110 @@ export function CreateBusinessModal() {
                 />
                 <div>
                   <FormDate
+                    isRequired
                     label="Business Creation Date"
                     placeholder="01/01/2024"
-                    isRequired
                     setFieldValue={businessCreationInfo.setFieldValue}
                     {...businessCreationInfo.getFieldProps(
                       "businessCreationDate",
                     )}
-                    // isInvalid={caTouched?.dob && !!caError?.dob}
-                    // errorMessage={caTouched?.dob && caError?.dob}
+                    isInvalid={
+                      formTouched.businessCreationDate &&
+                      !!formError.businessCreationDate
+                    }
+                    errorMessage={
+                      formTouched.businessCreationDate &&
+                      formError.businessCreationDate
+                    }
                   />
                 </div>
                 <FormSelect
+                  listContent={businessEntityTypes}
                   label="Business entity type"
-                  setFieldValue={() => {}}
-                  listContent={[
-                    {
-                      label: "Other",
-                      value: "other",
-                    },
-                  ]}
+                  placeholder="Select business entity type"
+                  name="businessEntityType"
+                  setFieldValue={(field, value) => {
+                    businessCreationInfo.setFieldValue(field, value);
+                    if (value && value !== "other") excemptPromptOnOpen();
+                  }}
+                  isRequired
+                  isInvalid={
+                    formTouched.businessEntityType &&
+                    !!formError.businessEntityType
+                  }
+                  errorMessage={
+                    formTouched.businessEntityType &&
+                    formError.businessEntityType
+                  }
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="danger" variant="light" onPress={onClose}>
+                <ExcemptPrompt
+                  isOpen={excemptPromptOpen}
+                  onOpenChange={excemptPromptOnOpenChange}
+                  entityType={businessCreationInfo.values.businessEntityType}
+                />
+                <Button
+                  color="danger"
+                  variant="light"
+                  type="button"
+                  onPress={onClose}
+                >
                   Close
                 </Button>
                 <Button
                   color="primary"
-                  type="submit"
+                  type="button"
                   isLoading={businessCreationInfo.isSubmitting}
+                  onPress={() => businessCreationInfo.handleSubmit()}
                 >
                   Create Business
                 </Button>
               </ModalFooter>
             </form>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
+  );
+}
+
+function ExcemptPrompt({
+  entityType,
+  isOpen,
+  onOpenChange,
+}: {
+  entityType: string;
+  isOpen: boolean;
+  onOpenChange: () => void;
+}) {
+  return (
+    <>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Did you know?
+              </ModalHeader>
+              <ModalBody>
+                <p>
+                  <b>
+                    {entityType.endsWith("y")
+                      ? entityType.slice(0, -1) + "ies"
+                      : entityType + "s"}
+                  </b>{" "}
+                  are exempt from filing BOI Reports? Based on the guidance
+                  given by FinCEN and your stated business entity type, you
+                  don&apos;t need to file a BOI Report!
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="danger" variant="flat" onPress={onClose}>
+                  Close
+                </Button>
+              </ModalFooter>
+            </>
           )}
         </ModalContent>
       </Modal>
