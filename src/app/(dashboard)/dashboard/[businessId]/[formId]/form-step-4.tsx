@@ -99,32 +99,6 @@ const SectionForm = ({
   const caError = (error?.[level] || {}) as FormikErrors<boFormInterface>;
 
   useEffect(() => {
-    setFieldValue(`bo.${level}.identification.state`, "");
-    setFieldValue(`bo.${level}.identification.otherTribe`, "");
-    setFieldValue(`bo.${level}.identification.localTribal`, "");
-
-    const isPriorityCty = priorityCountries.some(
-      (country) => country.value === boValue.identification.jurisdiction,
-    );
-    setIsPriorityJurisdiction(isPriorityCty);
-    if (isPriorityCty) {
-      setFieldValue(
-        `bo.${level}.identification.state`,
-        boValue.identification.jurisdiction,
-      );
-    } else {
-      setFieldValue(`bo.${level}.identification.state`, "");
-    }
-  }, [boValue.identification.jurisdiction]);
-
-  useEffect(() => {
-    setFieldValue(`bo.${level}.identification.jurisdiction`, "");
-    setFieldValue(`bo.${level}.identification.state`, "");
-    setFieldValue(`bo.${level}.identification.otherTribe`, "");
-    setFieldValue(`bo.${level}.identification.localTribal`, "");
-  }, [boValue.identification.type]);
-
-  useEffect(() => {
     const isUnitedStates = boValue.country === "US";
     const isPriorityCty = priorityCountries.some(
       (country) => country.value === boValue.country,
@@ -138,14 +112,6 @@ const SectionForm = ({
       setFieldValue(`bo.${level}.state`, "");
     }
   }, [boValue.country]);
-
-  useEffect(() => {
-    if (boValue.identification.type === "39") {
-      setFieldValue(`bo.${level}.identification.jurisdiction`, "US");
-    } else {
-      setFieldValue(`bo.${level}.identification.jurisdiction`, "");
-    }
-  }, [boValue.identification.type]);
 
   const getStateForCountry = (dependentCountry: string) => {
     const priorityCountry = priorityCountries.find(
@@ -380,7 +346,29 @@ const SectionForm = ({
                   name={`bo.${level}.identification.type`}
                   isRequired
                   selectedKey={boValue.identification.type}
-                  setFieldValue={setFieldValue}
+                  setFieldValue={(field, value) => {
+                    setFieldValue(
+                      `bo.${level}.identification.jurisdiction`,
+                      "",
+                    );
+                    setFieldValue(`bo.${level}.identification.state`, "");
+                    setFieldValue(`bo.${level}.identification.otherTribe`, "");
+                    setFieldValue(`bo.${level}.identification.localTribal`, "");
+
+                    if (value === "39") {
+                      setFieldValue(
+                        `bo.${level}.identification.jurisdiction`,
+                        "US",
+                      );
+                    } else {
+                      setFieldValue(
+                        `bo.${level}.identification.jurisdiction`,
+                        "",
+                      );
+                    }
+
+                    setFieldValue(field, value);
+                  }}
                   onBlur={handleBlur}
                   isInvalid={
                     caTouched?.identification?.type &&
@@ -415,7 +403,24 @@ const SectionForm = ({
                   isRequired
                   name={`bo.${level}.identification.jurisdiction`}
                   selectedKey={boValue.identification.jurisdiction}
-                  setFieldValue={setFieldValue}
+                  setFieldValue={(field, value) => {
+                    setFieldValue(`bo.${level}.identification.state`, "");
+                    setFieldValue(`bo.${level}.identification.otherTribe`, "");
+                    setFieldValue(`bo.${level}.identification.localTribal`, "");
+
+                    const isPriorityCty = priorityCountries.some(
+                      (country) => country.value === value,
+                    );
+                    const isUnitedStates = value === "US";
+                    setIsPriorityJurisdiction(isPriorityCty);
+                    if (isPriorityCty && !isUnitedStates) {
+                      setFieldValue(`bo.${level}.identification.state`, value);
+                    } else {
+                      setFieldValue(`bo.${level}.identification.state`, "");
+                    }
+
+                    return setFieldValue(field, value);
+                  }}
                   isInvalid={
                     caTouched?.identification?.jurisdiction &&
                     !!caError?.identification?.jurisdiction

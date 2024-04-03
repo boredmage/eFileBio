@@ -65,7 +65,7 @@ const FormCard = ({
           variant="dot"
           className="absolute left-4 top-2 !mt-2 border-[0.5px] text-xs"
         >
-          {status}
+          {status === "INREVIEW" ? "IN-REVIEW" : status}
         </Chip>
       </Link>
     </div>
