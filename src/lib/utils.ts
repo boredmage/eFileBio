@@ -19,3 +19,12 @@ export function absoluteUrl(path: string) {
   if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}${path}`;
   return `http://localhost:${process.env.PORT ?? 3000}${path}`;
 }
+
+export function getFileSize(size: number) {
+  const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+  return (
+    Number((size / Math.pow(1024, i)).toFixed(2)) * 1 +
+    " " +
+    ["B", "KB", "MB", "GB", "TB"][i]
+  );
+}

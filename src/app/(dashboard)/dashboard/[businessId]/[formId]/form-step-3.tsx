@@ -16,14 +16,21 @@ import {
   Avatar,
   Button,
   Divider,
+  Skeleton,
 } from "@nextui-org/react";
 import clsx from "clsx";
 import { FormikErrors, FormikProps } from "formik";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { LoaderCircle, Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { caFormShape } from "./form-shape";
 import { iFormType } from "./form";
 import { caFormInterface } from "@/types";
+import { UploadButton } from "@/utils/uploadthing";
+import { ClientUploadedFileData } from "uploadthing/types";
+import { getFileSize } from "@/lib/utils";
+import IdentifyingDocument, {
+  IdentifyingDocumentLoader,
+} from "../../components/identifying-document";
 
 const FormStep3 = ({ formData }: { formData: FormikProps<iFormType> }) => {
   const [section, setSection] = useState([{}]);
@@ -79,6 +86,8 @@ const SectionForm = ({
   const [isPriorityCountry, setIsPriorityCountry] = useState(false);
   const [isPriorityJurisdiction, setIsPriorityJurisdiction] = useState(false);
 
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+
   const {
     values,
     touched,
@@ -98,22 +107,10 @@ const SectionForm = ({
   const caError = (error?.[level] || {}) as FormikErrors<caFormInterface>;
 
   useEffect(() => {
-    // setFieldValue(`ca.${level}.identification.state`, "");
-    // setFieldValue(`ca.${level}.identification.otherTribe`, "");
-    // setFieldValue(`ca.${level}.identification.localTribal`, "");
-
     const isPriorityCty = priorityCountries.some(
       (country) => country.value === caValue.identification.jurisdiction,
     );
     setIsPriorityJurisdiction(isPriorityCty);
-    // if (isPriorityCty && caValue.identification.jurisdiction !== "US") {
-    //   setFieldValue(
-    //     `ca.${level}.identification.state`,
-    //     caValue.identification.jurisdiction,
-    //   );
-    // } else {
-    //   setFieldValue(`ca.${level}.identification.state`, "");
-    // }
   }, [caValue.identification.jurisdiction]);
 
   useEffect(() => {
@@ -156,6 +153,18 @@ const SectionForm = ({
     setFieldValue(`ca.${level}.identification.jurisdiction`, "");
     setFieldValue(`ca.${level}.identification.otherTribe`, "");
     setFieldValue(`ca.${level}.identification.localTribal`, "");
+  };
+
+  const handleClientUploadComplete = (res: ClientUploadedFileData<null>[]) => {
+    const uploadData = res[0];
+    const { name, size, type, url } = uploadData;
+    setFieldValue(`ca.${level}.identification.image`, url);
+    setFieldValue(`ca.${level}.identifyingDocument.name`, name);
+    setFieldValue(`ca.${level}.identifyingDocument.size`, size);
+    setFieldValue(`ca.${level}.identifyingDocument.type`, type);
+    setIsUploadingDoc(false);
+    setFieldError(`ca.${level}.identification.image`, "");
+    setFieldTouched(`ca.${level}.identification.image`, false);
   };
 
   return (
@@ -480,36 +489,57 @@ const SectionForm = ({
         <Divider className="bg-[#F5F5F5]" />
         <div className="space-y-6 py-6">
           <div className="flex items-center justify-between">
-            <h2 className="font-semibold">
-              Identifying document image <span className="text-red-500">*</span>
-            </h2>
-            <Button
-              variant="bordered"
-              color="warning"
-              radius="full"
-              startContent={<Plus />}
-              className="text-black"
-            >
-              Add Attachment
-            </Button>
-          </div>
-          {/* <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
-            <div className="flex w-fit gap-4">
-              <Avatar
-                src={"/pdf-logo.png"}
-                className="mx-auto !block h-12 w-12 !rounded-md !bg-transparent text-large"
-              />
-              <div>
-                <h2 className="text-xl font-semibold">
-                  New Business eFiling.pdf
-                </h2>
-                <p className="text-sm text-[#525252]">2.4mb</p>
-              </div>
+            <div>
+              <h2 className="font-semibold">
+                Identifying document <span className="text-red-500">*</span>
+              </h2>
+              {caTouched?.identification?.image &&
+                caError?.identification?.image && (
+                  <p className="text-sm text-red-500">
+                    {caError.identification.image}
+                  </p>
+                )}
             </div>
-            <Button isIconOnly size="lg" className="bg-white shadow-sm">
-              <Trash2 className="text-red-500" />
-            </Button>
-          </div> */}
+            <UploadButton
+              endpoint="fileUploader"
+              className="outline-none ut-button:w-auto ut-button:rounded-full ut-button:border-2 ut-button:border-warning-500 ut-button:bg-white ut-button:px-4 ut-button:text-sm ut-button:text-black ut-button:outline-none ut-button:after:bg-warning-500 ut-allowed-content:hidden"
+              onBeforeUploadBegin={(files) => {
+                console.log(files);
+                setIsUploadingDoc(true);
+                return files;
+              }}
+              content={{
+                button: (
+                  <span className="flex items-center gap-2">
+                    {isUploadingDoc ? (
+                      <LoaderCircle className="animate-spin" />
+                    ) : (
+                      <Plus />
+                    )}
+                    <span className="block">Add Attachment</span>
+                  </span>
+                ),
+              }}
+              onClientUploadComplete={handleClientUploadComplete}
+              onUploadError={(error: Error) => {
+                setIsUploadingDoc(false);
+              }}
+            />
+          </div>
+          {isUploadingDoc && <IdentifyingDocumentLoader />}
+          {caValue.identification.image && !isUploadingDoc && (
+            <IdentifyingDocument
+              identifyingDocumentName={caValue.identifyingDocument.name}
+              identifyingDocumentType={caValue.identifyingDocument.type}
+              identifyingDocumentSize={caValue.identifyingDocument.size}
+              identifyingDocumentResetHandler={() => {
+                setFieldValue(`ca.${level}.identification.image`, "");
+                setFieldValue(`ca.${level}.identifyingDocument.name`, "");
+                setFieldValue(`ca.${level}.identifyingDocument.size`, "");
+                setFieldValue(`ca.${level}.identifyingDocument.type`, "");
+              }}
+            />
+          )}
         </div>
       </AccordionItem>
     </Accordion>

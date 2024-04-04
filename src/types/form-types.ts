@@ -48,6 +48,12 @@ export interface caFormInterface {
     state: string;
     localTribal: string;
     otherTribe: string;
+    image: string;
+  };
+  identifyingDocument: {
+    name: string;
+    size: number;
+    type: string;
   };
 }
 

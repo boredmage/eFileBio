@@ -14,6 +14,20 @@ export const ourFileRouter = {
       return { userId: user.id };
     })
     .onUploadComplete(async ({ metadata, file }) => {}),
+  fileUploader: f({
+    image: { maxFileSize: "4MB" },
+    pdf: { maxFileSize: "4MB" },
+  })
+    .middleware(async ({ req }) => {
+      const user = await getToken({ req });
+      if (!user) throw new UploadThingError("Unauthorized");
+
+      return { userId: user.id };
+    })
+    .onUploadError(async ({ error }) => {
+      return { error };
+    })
+    .onUploadComplete(async ({ metadata, file }) => {}),
 } satisfies FileRouter;
 
 export type OurFileRouter = typeof ourFileRouter;

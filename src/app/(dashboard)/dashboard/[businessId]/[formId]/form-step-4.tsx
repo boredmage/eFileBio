@@ -20,11 +20,16 @@ import {
 } from "@nextui-org/react";
 import clsx from "clsx";
 import { FormikErrors, FormikProps } from "formik";
-import { Minus, Plus, Trash2 } from "lucide-react";
+import { LoaderCircle, Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { boFormShape } from "./form-shape";
 import { iFormType } from "./form";
 import { boFormInterface } from "@/types";
+import IdentifyingDocument, {
+  IdentifyingDocumentLoader,
+} from "../../components/identifying-document";
+import { UploadButton } from "@/utils/uploadthing";
+import { ClientUploadedFileData } from "uploadthing/types";
 
 const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
   const [section, setSection] = useState([{}]);
@@ -98,6 +103,8 @@ const SectionForm = ({
   const caTouched = touch?.[level];
   const caError = (error?.[level] || {}) as FormikErrors<boFormInterface>;
 
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+
   useEffect(() => {
     const isUnitedStates = boValue.country === "US";
     const isPriorityCty = priorityCountries.some(
@@ -137,6 +144,18 @@ const SectionForm = ({
     } else {
       return sortedCountries;
     }
+  };
+
+  const handleClientUploadComplete = (res: ClientUploadedFileData<null>[]) => {
+    const uploadData = res[0];
+    const { name, size, type, url } = uploadData;
+    setFieldValue(`bo.${level}.identification.image`, url);
+    setFieldValue(`bo.${level}.identifyingDocument.name`, name);
+    setFieldValue(`bo.${level}.identifyingDocument.size`, size);
+    setFieldValue(`bo.${level}.identifyingDocument.type`, type);
+    setIsUploadingDoc(false);
+    setFieldError(`bo.${level}.identification.image`, "");
+    setFieldTouched(`bo.${level}.identification.image`, false);
   };
 
   return (
@@ -500,37 +519,57 @@ const SectionForm = ({
             <Divider className="bg-[#F5F5F5]" />
             <div className="space-y-6 py-6">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold">
-                  Identifying document image{" "}
-                  <span className="text-red-500">*</span>
-                </h2>
-                <Button
-                  variant="bordered"
-                  color="warning"
-                  radius="full"
-                  startContent={<Plus />}
-                  className="text-black"
-                >
-                  Add Attachment
-                </Button>
+                <div>
+                  <h2 className="font-semibold">
+                    Identifying document <span className="text-red-500">*</span>
+                  </h2>
+                  {caTouched?.identification?.image &&
+                    caError?.identification?.image && (
+                      <p className="text-sm text-red-500">
+                        {caError.identification.image}
+                      </p>
+                    )}
+                </div>
+                <UploadButton
+                  endpoint="fileUploader"
+                  className="outline-none ut-button:w-auto ut-button:rounded-full ut-button:border-2 ut-button:border-warning-500 ut-button:bg-white ut-button:px-4 ut-button:text-sm ut-button:text-black ut-button:outline-none ut-button:after:bg-warning-500 ut-allowed-content:hidden"
+                  onBeforeUploadBegin={(files) => {
+                    console.log(files);
+                    setIsUploadingDoc(true);
+                    return files;
+                  }}
+                  content={{
+                    button: (
+                      <span className="flex items-center gap-2">
+                        {isUploadingDoc ? (
+                          <LoaderCircle className="animate-spin" />
+                        ) : (
+                          <Plus />
+                        )}
+                        <span className="block">Add Attachment</span>
+                      </span>
+                    ),
+                  }}
+                  onClientUploadComplete={handleClientUploadComplete}
+                  onUploadError={(error: Error) => {
+                    setIsUploadingDoc(false);
+                  }}
+                />
               </div>
-              {/* <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
-            <div className="flex w-fit gap-4">
-              <Avatar
-                src={"/pdf-logo.png"}
-                className="mx-auto !block h-12 w-12 !rounded-md !bg-transparent text-large"
-              />
-              <div>
-                <h2 className="text-xl font-semibold">
-                  New Business eFiling.pdf
-                </h2>
-                <p className="text-sm text-[#525252]">2.4mb</p>
-              </div>
-            </div>
-            <Button isIconOnly size="lg" className="bg-white shadow-sm">
-              <Trash2 className="text-red-500" />
-            </Button>
-          </div> */}
+              {isUploadingDoc && <IdentifyingDocumentLoader />}
+              {boValue.identification.image && !isUploadingDoc && (
+                <IdentifyingDocument
+                  identifyingDocumentName={boValue.identifyingDocument.name}
+                  identifyingDocumentType={boValue.identifyingDocument.type}
+                  identifyingDocumentSize={boValue.identifyingDocument.size}
+                  identifyingDocumentResetHandler={() => {
+                    setFieldValue(`bo.${level}.identification.image`, "");
+                    setFieldValue(`bo.${level}.identifyingDocument.name`, "");
+                    setFieldValue(`bo.${level}.identifyingDocument.size`, "");
+                    setFieldValue(`bo.${level}.identifyingDocument.type`, "");
+                  }}
+                />
+              )}
             </div>
           </>
         )}

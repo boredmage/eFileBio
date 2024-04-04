@@ -42,6 +42,7 @@ const formStep3Validation = Yup.array().of(
           then: (schema) => schema.required("Other tribe is a required field"),
           otherwise: (schema) => schema.notRequired(),
         }),
+        image: Yup.string().required("Identification document is required"),
       }),
     },
     [["state", "localTribe"]],
