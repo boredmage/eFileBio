@@ -51,6 +51,12 @@ export const caFormShape: caFormInterface = {
     state: "",
     localTribal: "",
     otherTribe: "",
+    image: "",
+  },
+  identifyingDocument: {
+    name: "",
+    size: 0,
+    type: "",
   },
 };
 
@@ -75,5 +81,11 @@ export const boFormShape: boFormInterface = {
     state: "",
     localTribal: "",
     otherTribe: "",
+    image: "",
+  },
+  identifyingDocument: {
+    name: "",
+    size: 0,
+    type: "",
   },
 };
