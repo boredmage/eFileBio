@@ -8,11 +8,13 @@ const IdentifyingDocument = ({
   identifyingDocumentName,
   identifyingDocumentSize,
   identifyingDocumentResetHandler,
+  isReadOnly,
 }: {
   identifyingDocumentType: string;
   identifyingDocumentName: string;
   identifyingDocumentSize: number;
   identifyingDocumentResetHandler: () => void;
+  isReadOnly?: boolean;
 }) => {
   return (
     <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
@@ -32,14 +34,16 @@ const IdentifyingDocument = ({
           </p>
         </div>
       </div>
-      <Button
-        isIconOnly
-        size="lg"
-        className="bg-white shadow-sm"
-        onClick={identifyingDocumentResetHandler}
-      >
-        <Trash2 className="text-red-500" />
-      </Button>
+      {!isReadOnly && (
+        <Button
+          isIconOnly
+          size="lg"
+          className="bg-white shadow-sm"
+          onClick={identifyingDocumentResetHandler}
+        >
+          <Trash2 className="text-red-500" />
+        </Button>
+      )}
     </div>
   );
 };

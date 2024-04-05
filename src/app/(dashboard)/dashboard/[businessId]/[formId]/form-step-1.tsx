@@ -13,9 +13,11 @@ import TaxIdFormInput from "@/components/taxId-form-input";
 const FormStep1 = ({
   formData,
   datePrepared,
+  isPreview,
 }: {
   formData: FormikProps<iFormType>;
   datePrepared: Date;
+  isPreview?: boolean;
 }) => {
   const { values, touched, errors, getFieldProps, setFieldValue, handleBlur } =
     formData;
@@ -44,23 +46,6 @@ const FormStep1 = ({
 
   return (
     <form onSubmit={formData.handleSubmit}>
-      {/* <div className="grid grid-cols-2 gap-6 py-6">
-        <FormDate
-          label={<span className="text-sm">Business Creation Date</span>}
-          placeholder={`01/01/${new Date().getFullYear()}`}
-          labelPlacement="outside"
-          size="lg"
-          startContent={<CalendarDays />}
-          radius="sm"
-        />
-        <FormSelect
-          listContent={[]}
-          label="Entity Type"
-          placeholder="Securities reporting issuer"
-          startContent={<BookAudio />}
-        />
-      </div> */}
-
       <div className="space-y-6 py-6">
         <div>
           <h2 className="text-xl font-semibold">Filing Information</h2>
@@ -75,6 +60,7 @@ const FormStep1 = ({
             <span className="text-red-500">*</span>
           </h2>
           <RadioCheckbox
+            isReadOnly={isPreview}
             name="fi.filingType"
             values={[
               { label: "a. Initial report", value: "INITIAL" },
@@ -113,7 +99,7 @@ const FormStep1 = ({
               })
               .split("/")
               .join(" / ")}
-            disabled
+            isReadOnly
           />
         </div>
       </div>
@@ -130,6 +116,7 @@ const FormStep1 = ({
                 label="Legal Name"
                 isRequired
                 {...getFieldProps("fi.legalName")}
+                isReadOnly={isPreview}
                 isInvalid={fiTouched?.legalName && !!fiError?.legalName}
                 errorMessage={fiTouched?.legalName && fiError?.legalName}
               />
@@ -147,6 +134,7 @@ const FormStep1 = ({
                   return setFieldValue(field, value);
                 }}
                 onBlur={handleBlur}
+                isReadOnly={isPreview}
                 isInvalid={fiTouched?.taxType && !!fiError?.taxType}
                 errorMessage={fiTouched?.taxType && fiError?.taxType}
                 isRequired
@@ -158,6 +146,7 @@ const FormStep1 = ({
                 value={fiValue.taxId}
                 setFieldValue={setFieldValue}
                 isDisabled={!fiValue.taxType}
+                isReadOnly={isPreview}
                 isInvalid={fiTouched?.taxId && !!fiError?.taxId}
                 errorMessage={fiTouched?.taxId && fiError?.taxId}
                 isRequired
@@ -170,6 +159,7 @@ const FormStep1 = ({
                 selectedKey={fiValue.taxJurisdiction}
                 setFieldValue={setFieldValue}
                 onBlur={handleBlur}
+                isReadOnly={isPreview}
                 isInvalid={
                   fiTouched?.taxJurisdiction && !!fiError?.taxJurisdiction
                 }

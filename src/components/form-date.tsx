@@ -62,6 +62,9 @@ const FormDate = ({
                 onClick={(e) => {
                   e?.stopPropagation();
                   e?.preventDefault();
+
+                  if (props.isReadOnly) return;
+
                   setDate("");
                   onChange?.({
                     target: { value: "" },
@@ -101,6 +104,7 @@ const FormDate = ({
             actions.onHidden();
           }}
           initialFocus
+          disabled={props.isReadOnly}
         />
       </PopoverContent>
     </Popover>

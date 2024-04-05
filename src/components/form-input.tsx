@@ -15,7 +15,7 @@ const FormInput = ({
       <Input
         type={type}
         label={<span className="text-sm text-[#404040]">{label}</span>}
-        placeholder={placeholder}
+        placeholder={props.isReadOnly ? " " : placeholder}
         labelPlacement="outside"
         size="lg"
         radius="sm"

@@ -3,6 +3,7 @@ import {
   Autocomplete,
   AutocompleteItem,
   AutocompleteProps,
+  MenuTriggerAction,
 } from "@nextui-org/react";
 
 const FormSelect = ({
@@ -23,7 +24,7 @@ const FormSelect = ({
     <div className={cn("relative", className)}>
       <Autocomplete
         label={<span className="text-sm text-[#404040]">{label}</span>}
-        placeholder={placeholder}
+        placeholder={props.isReadOnly ? " " : placeholder}
         labelPlacement="outside"
         size="lg"
         radius="sm"
@@ -39,7 +40,12 @@ const FormSelect = ({
         {...props}
       >
         {listContent.map((list, i) => (
-          <AutocompleteItem key={list.value} value={list.value}>
+          <AutocompleteItem
+            key={list.value}
+            value={list.value}
+            isReadOnly={props.isReadOnly}
+            isDisabled={props.isReadOnly}
+          >
             {list.label}
           </AutocompleteItem>
         ))}

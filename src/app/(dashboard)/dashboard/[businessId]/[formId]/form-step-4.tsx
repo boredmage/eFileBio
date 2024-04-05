@@ -31,7 +31,13 @@ import IdentifyingDocument, {
 import { UploadButton } from "@/utils/uploadthing";
 import { ClientUploadedFileData } from "uploadthing/types";
 
-const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
+const FormStep4 = ({
+  formData,
+  isPreview,
+}: {
+  formData: FormikProps<iFormType>;
+  isPreview?: boolean;
+}) => {
   const [section, setSection] = useState([{}]);
   const { values, setValues, setFieldValue, handleSubmit, submitForm } =
     formData;
@@ -52,6 +58,10 @@ const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
     );
   };
 
+  useEffect(() => {
+    setSection(bo.length > 0 ? bo : [boFormShape]);
+  }, []);
+
   return (
     <form onSubmit={handleSubmit}>
       {section.map((_, index) => (
@@ -62,6 +72,7 @@ const FormStep4 = ({ formData }: { formData: FormikProps<iFormType> }) => {
           total={section.length}
           removeSection={removeSection}
           handleAddSection={handleAddSection}
+          isPreview={isPreview}
         />
       ))}
     </form>
@@ -74,12 +85,14 @@ const SectionForm = ({
   total,
   handleAddSection,
   formData,
+  isPreview,
 }: {
   level: number;
   total: number;
   removeSection: (index: number) => void;
   handleAddSection: () => void;
   formData: FormikProps<iFormType>;
+  isPreview?: boolean;
 }) => {
   const [isUnitedStates, setIsUnitedStates] = useState(false);
   const [isPriorityCountry, setIsPriorityCountry] = useState(false);
@@ -178,20 +191,22 @@ const SectionForm = ({
               <span>
                 {level + 1} of {total}
               </span>
-              <div className="flex items-center justify-center gap-3">
-                <span
-                  className="rounded-lg bg-[#F5F5F5] p-2 text-black"
-                  onClick={handleAddSection}
-                >
-                  <Plus />
-                </span>
-                <span
-                  className="rounded-lg bg-[#F5F5F5] p-2 text-black"
-                  onClick={() => removeSection(level)}
-                >
-                  <Minus />
-                </span>
-              </div>
+              {!isPreview && (
+                <div className="flex items-center justify-center gap-3">
+                  <span
+                    className="rounded-lg bg-[#F5F5F5] p-2 text-black"
+                    onClick={handleAddSection}
+                  >
+                    <Plus />
+                  </span>
+                  <span
+                    className="rounded-lg bg-[#F5F5F5] p-2 text-black"
+                    onClick={() => removeSection(level)}
+                  >
+                    <Minus />
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         }
@@ -208,6 +223,7 @@ const SectionForm = ({
                   icon: "text-white",
                   wrapper: "top-1",
                 }}
+                isReadOnly={isPreview}
                 {...getFieldProps(`bo.${level}.isParentGuardianInformation`)}
               >
                 <h2 className="font-semibold">
@@ -226,6 +242,7 @@ const SectionForm = ({
                 <FormInput
                   label="FinCEN ID"
                   {...getFieldProps(`bo.${level}.fincenId`)}
+                  isReadOnly={isPreview}
                 />
               </div>
             </div>
@@ -250,6 +267,7 @@ const SectionForm = ({
               }
               setFieldValue(`bo.${level}.isExemptEntity`, isSelected);
             }}
+            isReadOnly={isPreview}
           >
             Is this an Exempt entity
           </Checkbox>
@@ -264,12 +282,14 @@ const SectionForm = ({
                   label="First name"
                   isRequired
                   {...getFieldProps(`bo.${level}.firstName`)}
+                  isReadOnly={isPreview}
                   isInvalid={caTouched?.firstName && !!caError?.firstName}
                   errorMessage={caTouched?.firstName && caError?.firstName}
                 />
                 <FormInput
                   label="Middle name"
                   {...getFieldProps(`bo.${level}.middleName`)}
+                  isReadOnly={isPreview}
                 />
               </>
             )}
@@ -277,6 +297,7 @@ const SectionForm = ({
               label="Individual's last name or entity's legal name"
               isRequired
               {...getFieldProps(`bo.${level}.lastName`)}
+              isReadOnly={isPreview}
               isInvalid={caTouched?.lastName && !!caError?.lastName}
               errorMessage={caTouched?.lastName && caError?.lastName}
             />
@@ -286,6 +307,7 @@ const SectionForm = ({
               <FormInput
                 label="Suffix"
                 {...getFieldProps(`bo.${level}.suffix`)}
+                isReadOnly={isPreview}
               />
               <FormDate
                 label="Date of birth"
@@ -293,6 +315,7 @@ const SectionForm = ({
                 isRequired
                 setFieldValue={setFieldValue}
                 {...getFieldProps(`bo.${level}.dob`)}
+                isReadOnly={isPreview}
                 isInvalid={caTouched?.dob && !!caError?.dob}
                 errorMessage={caTouched?.dob && caError?.dob}
               />
@@ -313,6 +336,7 @@ const SectionForm = ({
                   selectedKey={boValue.country}
                   setFieldValue={setFieldValue}
                   onBlur={handleBlur}
+                  isReadOnly={isPreview}
                   isInvalid={caTouched?.country && !!caError?.country}
                   errorMessage={caTouched?.country && caError?.country}
                 />
@@ -320,6 +344,7 @@ const SectionForm = ({
                   label="Address (number, street, and apt. or suite no.)"
                   isRequired
                   {...getFieldProps(`bo.${level}.address`)}
+                  isReadOnly={isPreview}
                   isInvalid={caTouched?.address && !!caError?.address}
                   errorMessage={caTouched?.address && caError?.address}
                 />
@@ -329,6 +354,7 @@ const SectionForm = ({
                   label="City"
                   isRequired
                   {...getFieldProps(`bo.${level}.city`)}
+                  isReadOnly={isPreview}
                   isInvalid={caTouched?.city && !!caError?.city}
                   errorMessage={caTouched?.city && caError?.city}
                 />
@@ -340,6 +366,7 @@ const SectionForm = ({
                   selectedKey={boValue.state}
                   setFieldValue={setFieldValue}
                   onBlur={handleBlur}
+                  isReadOnly={isPreview}
                   isInvalid={caTouched?.state && !!caError?.state}
                   errorMessage={caTouched?.state && caError?.state}
                   isDisabled={!isUnitedStates && !!boValue.country}
@@ -348,6 +375,7 @@ const SectionForm = ({
                   label="ZIP/Foreign postal code*"
                   isRequired
                   {...getFieldProps(`bo.${level}.zip`)}
+                  isReadOnly={isPreview}
                   isInvalid={caTouched?.zip && !!caError?.zip}
                   errorMessage={caTouched?.zip && caError?.zip}
                 />
@@ -389,6 +417,7 @@ const SectionForm = ({
                     setFieldValue(field, value);
                   }}
                   onBlur={handleBlur}
+                  isReadOnly={isPreview}
                   isInvalid={
                     caTouched?.identification?.type &&
                     !!caError?.identification?.type
@@ -402,6 +431,7 @@ const SectionForm = ({
                   label="Identifying document number"
                   isRequired
                   {...getFieldProps(`bo.${level}.identification.id`)}
+                  isReadOnly={isPreview}
                   isInvalid={
                     caTouched?.identification?.id &&
                     !!caError?.identification?.id
@@ -440,6 +470,7 @@ const SectionForm = ({
 
                     return setFieldValue(field, value);
                   }}
+                  isReadOnly={isPreview}
                   isInvalid={
                     caTouched?.identification?.jurisdiction &&
                     !!caError?.identification?.jurisdiction
@@ -469,6 +500,7 @@ const SectionForm = ({
                     (isPriorityJurisdiction &&
                       boValue.identification.jurisdiction !== "US")
                   }
+                  isReadOnly={isPreview}
                   isInvalid={
                     caTouched?.identification?.state &&
                     !!caError?.identification?.state
@@ -491,6 +523,7 @@ const SectionForm = ({
                     boValue.identification.type !== "38" ||
                     !!boValue.identification.state
                   }
+                  isReadOnly={isPreview}
                   isInvalid={
                     caTouched?.identification?.localTribal &&
                     !!caError?.identification?.localTribal
@@ -505,6 +538,7 @@ const SectionForm = ({
                   isRequired
                   {...getFieldProps(`bo.${level}.identification.otherTribe`)}
                   isDisabled={boValue.identification.localTribal !== "Other"}
+                  isReadOnly={isPreview}
                   isInvalid={
                     caTouched?.identification?.otherTribe &&
                     !!caError?.identification?.otherTribe
@@ -518,50 +552,54 @@ const SectionForm = ({
             </div>
             <Divider className="bg-[#F5F5F5]" />
             <div className="space-y-6 py-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-semibold">
-                    Identifying document <span className="text-red-500">*</span>
-                  </h2>
-                  {caTouched?.identification?.image &&
-                    caError?.identification?.image && (
-                      <p className="text-sm text-red-500">
-                        {caError.identification.image}
-                      </p>
-                    )}
+              {!isPreview && (
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="font-semibold">
+                      Identifying document{" "}
+                      <span className="text-red-500">*</span>
+                    </h2>
+                    {caTouched?.identification?.image &&
+                      caError?.identification?.image && (
+                        <p className="text-sm text-red-500">
+                          {caError.identification.image}
+                        </p>
+                      )}
+                  </div>
+                  <UploadButton
+                    endpoint="fileUploader"
+                    className="outline-none ut-button:w-auto ut-button:rounded-full ut-button:border-2 ut-button:border-warning-500 ut-button:bg-white ut-button:px-4 ut-button:text-sm ut-button:text-black ut-button:outline-none ut-button:after:bg-warning-500 ut-allowed-content:hidden"
+                    onBeforeUploadBegin={(files) => {
+                      console.log(files);
+                      setIsUploadingDoc(true);
+                      return files;
+                    }}
+                    content={{
+                      button: (
+                        <span className="flex items-center gap-2">
+                          {isUploadingDoc ? (
+                            <LoaderCircle className="animate-spin" />
+                          ) : (
+                            <Plus />
+                          )}
+                          <span className="block">Add Attachment</span>
+                        </span>
+                      ),
+                    }}
+                    onClientUploadComplete={handleClientUploadComplete}
+                    onUploadError={(error: Error) => {
+                      setIsUploadingDoc(false);
+                    }}
+                  />
                 </div>
-                <UploadButton
-                  endpoint="fileUploader"
-                  className="outline-none ut-button:w-auto ut-button:rounded-full ut-button:border-2 ut-button:border-warning-500 ut-button:bg-white ut-button:px-4 ut-button:text-sm ut-button:text-black ut-button:outline-none ut-button:after:bg-warning-500 ut-allowed-content:hidden"
-                  onBeforeUploadBegin={(files) => {
-                    console.log(files);
-                    setIsUploadingDoc(true);
-                    return files;
-                  }}
-                  content={{
-                    button: (
-                      <span className="flex items-center gap-2">
-                        {isUploadingDoc ? (
-                          <LoaderCircle className="animate-spin" />
-                        ) : (
-                          <Plus />
-                        )}
-                        <span className="block">Add Attachment</span>
-                      </span>
-                    ),
-                  }}
-                  onClientUploadComplete={handleClientUploadComplete}
-                  onUploadError={(error: Error) => {
-                    setIsUploadingDoc(false);
-                  }}
-                />
-              </div>
+              )}
               {isUploadingDoc && <IdentifyingDocumentLoader />}
               {boValue.identification.image && !isUploadingDoc && (
                 <IdentifyingDocument
                   identifyingDocumentName={boValue.identifyingDocument.name}
                   identifyingDocumentType={boValue.identifyingDocument.type}
                   identifyingDocumentSize={boValue.identifyingDocument.size}
+                  isReadOnly={isPreview}
                   identifyingDocumentResetHandler={() => {
                     setFieldValue(`bo.${level}.identification.image`, "");
                     setFieldValue(`bo.${level}.identifyingDocument.name`, "");

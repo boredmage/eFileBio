@@ -16,7 +16,6 @@
     "@nextui-org/react": "^2.2.10",
     "@prisma/client": "^5.10.2",
     "@uploadthing/react": "^6.3.4",
-    "cloudinary": "^2.0.3",
     "clsx": "^2.1.0",
     "country-state-city": "^3.2.1",
     "date-fns": "^3.6.0",

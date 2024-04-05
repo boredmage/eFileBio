@@ -184,7 +184,7 @@ const Form = ({
             className="text-white"
             onClick={handleNext}
           >
-            {activeTab === 3 ? "File BOIR" : "Next"}
+            Save and Continue
           </Button>
           <PreviewModal
             formId={formId}
@@ -197,26 +197,23 @@ const Form = ({
                 <FormSteps.FormStep1
                   formData={formData as FormikProps<iFormType>}
                   datePrepared={form.createdAt}
+                  isPreview
                 />
                 <FormSteps.FormStep2
                   formData={formData as FormikProps<iFormType>}
+                  isPreview
                 />
                 <FormSteps.FormStep3
                   formData={formData as FormikProps<iFormType>}
+                  isPreview
                 />
                 <FormSteps.FormStep4
                   formData={formData as FormikProps<iFormType>}
+                  isPreview
                 />
               </>
             }
           />
-          {/* <FormCompletionModal
-            formId={formId}
-            business={business}
-            isOpen={modalIsOpen}
-            formVersion={form.version}
-            onOpenChange={modalOpenChangeHandler}
-          /> */}
         </div>
       </div>
     </div>

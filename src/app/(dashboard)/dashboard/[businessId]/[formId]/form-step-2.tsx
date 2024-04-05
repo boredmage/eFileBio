@@ -18,7 +18,13 @@ import { useEffect, useState } from "react";
 import { iFormType } from "./form";
 import TaxIdFormInput from "@/components/taxId-form-input";
 
-const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
+const FormStep2 = ({
+  formData,
+  isPreview,
+}: {
+  formData: FormikProps<iFormType>;
+  isPreview?: boolean;
+}) => {
   const {
     values,
     touched,
@@ -91,6 +97,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             classNames={{
               icon: "text-white",
             }}
+            isReadOnly={isPreview}
             {...getFieldProps("rc.isRequestingId")}
           >
             Request to receive FinCEN Identifier (FinCEN ID)
@@ -101,6 +108,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             classNames={{
               icon: "text-white",
             }}
+            isReadOnly={isPreview}
             {...getFieldProps("rc.isForeignPooledInvestmentVehicle")}
           >
             Foreign pooled investment vehicle
@@ -115,6 +123,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             label="Reporting Company legal name"
             isRequired
             {...getFieldProps("rc.legalName")}
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.legalName && !!rcError?.legalName}
             errorMessage={rcTouched?.legalName && rcError?.legalName}
           />
@@ -126,35 +135,43 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
                   <FormInput
                     label="Alternate name (e.g. trade name, DBA)"
                     {...getFieldProps(`rc.alternateNames[${index}]`)}
+                    isReadOnly={isPreview}
                   />
-                  <Button
-                    isIconOnly
-                    color={
-                      index === rcAlternateNameCount - 1 ? "warning" : "danger"
-                    }
-                    aria-label="Like"
-                    size="lg"
-                    variant="flat"
-                    className="text-black"
-                    onClick={() =>
-                      setRcAlternateNameCount((prev) => {
-                        if (index === rcAlternateNameCount - 1) return prev + 1;
-                        setFieldValue(
-                          "rc.alternateNames",
-                          rcValue.alternateNames.filter((_, i) => i !== index),
-                        );
-                        return prev - 1;
-                      })
-                    }
-                  >
-                    {(rcAlternateNameCount > 1 &&
-                      index === rcAlternateNameCount - 1) ||
-                    rcAlternateNameCount === 1 ? (
-                      <Plus />
-                    ) : (
-                      <Minus />
-                    )}
-                  </Button>
+                  {!isPreview && (
+                    <Button
+                      isIconOnly
+                      color={
+                        index === rcAlternateNameCount - 1
+                          ? "warning"
+                          : "danger"
+                      }
+                      aria-label="Like"
+                      size="lg"
+                      variant="flat"
+                      className="text-black"
+                      onClick={() =>
+                        setRcAlternateNameCount((prev) => {
+                          if (index === rcAlternateNameCount - 1)
+                            return prev + 1;
+                          setFieldValue(
+                            "rc.alternateNames",
+                            rcValue.alternateNames.filter(
+                              (_, i) => i !== index,
+                            ),
+                          );
+                          return prev - 1;
+                        })
+                      }
+                    >
+                      {(rcAlternateNameCount > 1 &&
+                        index === rcAlternateNameCount - 1) ||
+                      rcAlternateNameCount === 1 ? (
+                        <Plus />
+                      ) : (
+                        <Minus />
+                      )}
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
@@ -170,6 +187,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             name="rc.taxType"
             placeholder="Select an ID type"
             selectedKey={rcValue.taxType}
+            isReadOnly={isPreview}
             setFieldValue={(field, value) => {
               if (value !== "foreign") {
                 resetValueOnDiff("taxJurisdiction");
@@ -188,6 +206,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             taxType={rcValue.taxType}
             value={rcValue.taxId}
             setFieldValue={setFieldValue}
+            isReadOnly={isPreview}
             isDisabled={!rcValue.taxType}
             isInvalid={rcTouched?.taxId && !!rcError?.taxId}
             errorMessage={rcTouched?.taxId && rcError?.taxId}
@@ -201,6 +220,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             selectedKey={rcValue.taxJurisdiction}
             setFieldValue={setFieldValue}
             onBlur={handleBlur}
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.taxJurisdiction && !!rcError?.taxJurisdiction}
             errorMessage={
               rcTouched?.taxJurisdiction && rcError?.taxJurisdiction
@@ -223,6 +243,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             name="rc.jurisdiction"
             placeholder="Select a country"
             selectedKey={rcValue.jurisdiction}
+            isReadOnly={isPreview}
             setFieldValue={(field, value) => {
               const isUnitedStates = value === "US";
               const isPriorityCty = priorityCountries
@@ -263,6 +284,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
               label="State of formation"
               listContent={getStateForJurisdiction(rcValue.jurisdiction)}
               selectedKey={rcValue.domesticState}
+              isReadOnly={isPreview}
               isDisabled={
                 (!isUnitedStates && isPriorityCountry) ||
                 (!!rcValue.domesticTribalJurisdiction && isUnitedStates)
@@ -281,6 +303,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
                   setFieldValue={setFieldValue}
                   onBlur={handleBlur}
                   isDisabled={!!rcValue.domesticState}
+                  isReadOnly={isPreview}
                   isInvalid={
                     rcTouched?.domesticTribalJurisdiction &&
                     !!rcError?.domesticTribalJurisdiction
@@ -295,6 +318,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
                   {...getFieldProps("rc.domesticOtherTribe")}
                   isRequired={rcValue.domesticTribalJurisdiction === "Other"}
                   isDisabled={rcValue.domesticTribalJurisdiction !== "Other"}
+                  isReadOnly={isPreview}
                   isInvalid={
                     rcTouched?.domesticOtherTribe &&
                     !!rcError?.domesticOtherTribe
@@ -319,6 +343,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
               selectedKey={rcValue.foreignFirstState}
               setFieldValue={setFieldValue}
               isDisabled={!!rcValue.foreignTribalJurisdiction}
+              isReadOnly={isPreview}
               isInvalid={
                 rcTouched?.foreignFirstState && !!rcError?.foreignFirstState
               }
@@ -333,6 +358,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
               selectedKey={rcValue.foreignTribalJurisdiction}
               setFieldValue={setFieldValue}
               isDisabled={!!rcValue.foreignFirstState}
+              isReadOnly={isPreview}
               isInvalid={
                 rcTouched?.foreignTribalJurisdiction &&
                 !!rcError?.foreignTribalJurisdiction
@@ -347,6 +373,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
               {...getFieldProps("rc.foreignOtherTribe")}
               isRequired={rcValue.foreignTribalJurisdiction === "Other"}
               isDisabled={rcValue.foreignTribalJurisdiction !== "Other"}
+              isReadOnly={isPreview}
               isInvalid={
                 rcTouched?.foreignOtherTribe && !!rcError?.foreignOtherTribe
               }
@@ -383,6 +410,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             }}
             isRequired
             onBlur={handleBlur}
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.country && !!rcError?.country}
             errorMessage={rcTouched?.country && rcError?.country}
           />
@@ -390,6 +418,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             label="Address (number, street, and apt. or suite no.)"
             {...getFieldProps("rc.address")}
             isRequired
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.address && !!rcError?.address}
             errorMessage={rcTouched?.address && rcError?.address}
           />
@@ -399,6 +428,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             label="City"
             {...getFieldProps("rc.city")}
             isRequired
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.city && !!rcError?.city}
             errorMessage={rcTouched?.city && rcError?.city}
           />
@@ -410,6 +440,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             setFieldValue={setFieldValue}
             isRequired
             onBlur={handleBlur}
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.state && !!rcError?.state}
             errorMessage={rcTouched?.state && rcError?.state}
             isDisabled={!isAdUnitedStates && isAdPriorityCountry}
@@ -418,6 +449,7 @@ const FormStep2 = ({ formData }: { formData: FormikProps<iFormType> }) => {
             label="Zip Code"
             {...getFieldProps("rc.zip")}
             isRequired
+            isReadOnly={isPreview}
             isInvalid={rcTouched?.zip && !!rcError?.zip}
             errorMessage={rcTouched?.zip && rcError?.zip}
           />
