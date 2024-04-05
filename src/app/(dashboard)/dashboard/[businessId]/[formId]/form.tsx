@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { boFormInterface } from "@/types/form-types";
 import FormCompletionModal from "../../components/form-completion-modal";
 import { Business, Form as FormType } from "@prisma/client";
+import PreviewModal from "../../components/preview-modal";
 
 export type iFormType = {
   fi: fiFormInterface;
@@ -185,13 +186,37 @@ const Form = ({
           >
             {activeTab === 3 ? "File BOIR" : "Next"}
           </Button>
-          <FormCompletionModal
+          <PreviewModal
             formId={formId}
             business={business}
             isOpen={modalIsOpen}
             formVersion={form.version}
             onOpenChange={modalOpenChangeHandler}
+            formContent={
+              <>
+                <FormSteps.FormStep1
+                  formData={formData as FormikProps<iFormType>}
+                  datePrepared={form.createdAt}
+                />
+                <FormSteps.FormStep2
+                  formData={formData as FormikProps<iFormType>}
+                />
+                <FormSteps.FormStep3
+                  formData={formData as FormikProps<iFormType>}
+                />
+                <FormSteps.FormStep4
+                  formData={formData as FormikProps<iFormType>}
+                />
+              </>
+            }
           />
+          {/* <FormCompletionModal
+            formId={formId}
+            business={business}
+            isOpen={modalIsOpen}
+            formVersion={form.version}
+            onOpenChange={modalOpenChangeHandler}
+          /> */}
         </div>
       </div>
     </div>
