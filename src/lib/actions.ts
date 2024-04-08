@@ -6,6 +6,10 @@ import { prisma } from "./db";
 import { z } from "zod";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
+import {
+  fiFormShape,
+  rcFormShape,
+} from "@/app/(dashboard)/dashboard/[businessId]/[formId]/form-shape";
 
 const BusinessSchema = z.object({
   name: z.coerce
@@ -28,7 +32,6 @@ export async function createBusiness(business: {
   creationDate: Date;
   entityType: string;
 }) {
-  await new Promise((resolve) => setTimeout(resolve, 3000));
   try {
     const session = await getServerSession(authOptions);
 
@@ -137,10 +140,23 @@ export async function createForm(data: { businessId: string }) {
 
   const newForm = await prisma.form.create({
     data: {
-      businessId: business.id,
+      ownerId: user.id,
       version: formCount + 1,
+      businessId: business.id,
+      fi: {
+        create: {
+          ...fiFormShape,
+        },
+      },
+      rc: {
+        create: {
+          ...rcFormShape,
+        },
+      },
     },
   });
+
+  return newForm;
 
   revalidatePath(`/dashboard/${businessId}`);
   redirect(`/dashboard/${businessId}/${newForm.id}`);

@@ -44,6 +44,7 @@ model User {
   accounts      Account[]
   sessions      Session[]
   Business      Business[]
+  Form          Form[]
 }
 
 model VerificationToken {
@@ -62,13 +63,13 @@ model Business {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
   owner        User     @relation(fields: [ownerId], references: [id])
-  ownerId      String
+  ownerId      String   @map("ownerId")
   creationDate DateTime
   entityType   String
   forms        Form[]
 }
 
-enum FillingType {
+enum FilingType {
   INITIAL
   CORRECT
   UPDATE
@@ -81,6 +82,7 @@ enum FillingStatus {
   SUBMITTED
   APPROVED
   REJECTED
+  ARCHIVED
 }
 
 model Form {
@@ -88,6 +90,8 @@ model Form {
   version    Int           @default(autoincrement())
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
+  owner      User          @relation(fields: [ownerId], references: [id])
+  ownerId    String        @map("ownerId")
   business   Business      @relation(fields: [businessId], references: [id])
   businessId String
   status     FillingStatus @default(DRAFT)
@@ -96,12 +100,12 @@ model Form {
 }
 
 model FiForm {
-  id              String      @id @default(cuid())
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  form            Form        @relation(fields: [formId], references: [id])
-  formId          String      @unique
-  fillingType     FillingType
+  id              String     @id @default(cuid())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  form            Form       @relation(fields: [formId], references: [id])
+  formId          String     @unique
+  filingType      FilingType
   legalName       String
   taxType         String
   taxId           String

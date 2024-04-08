@@ -5,7 +5,12 @@ import { useEffect, useState } from "react";
 import FormTab from "../../components/form-tab";
 import FormSteps from "./form-steps";
 import { FormikProps, useFormik } from "formik";
-import { fiFormInterface, rcFormInterface, caFormInterface } from "@/types";
+import {
+  fiFormInterface,
+  rcFormInterface,
+  caFormInterface,
+  iFullFormType,
+} from "@/types";
 import { formValidation } from "@/utils/validations";
 import {
   boFormShape,
@@ -16,9 +21,9 @@ import {
 import { ArrowLeft, MoveRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { boFormInterface } from "@/types/form-types";
-import FormCompletionModal from "../../components/form-completion-modal";
-import { Business, Form as FormType } from "@prisma/client";
+import { Business, FiForm, Form as FormType } from "@prisma/client";
 import PreviewModal from "../../components/preview-modal";
+import { saveForm } from "@/lib/form-actions";
 
 export type iFormType = {
   fi: fiFormInterface;
@@ -33,7 +38,7 @@ const Form = ({
   business,
 }: {
   params: { businessId: string; formId: string };
-  form: FormType;
+  form: iFullFormType;
   business: Business;
 }) => {
   const router = useRouter();
@@ -64,8 +69,42 @@ const Form = ({
         (businessId as string).concat(formId as string),
       );
 
-      if (savedData) {
-        formData.setValues(JSON.parse(savedData));
+      if (!savedData) {
+        formData.setValues({
+          fi: form.fi ?? fiFormShape,
+          rc: form.rc ?? rcFormShape,
+          ca: [caFormShape],
+          bo: [boFormShape],
+        });
+        return;
+      }
+      const { fi, rc, ca, bo } = JSON.parse(savedData) as iFormType;
+      const fiEntry = fi ?? fiFormShape;
+      const rcEntry = rc ?? rcFormShape;
+      const caEntry = ca ?? [caFormShape];
+      const boEntry = bo ?? [boFormShape];
+
+      if (form) {
+        formData.setValues({
+          fi: form.fi ?? fiEntry,
+          rc: form.rc ?? rcEntry,
+          ca: caEntry,
+          bo: boEntry,
+        });
+      } else if (savedData) {
+        formData.setValues({
+          fi: fiEntry,
+          rc: rcEntry,
+          ca: caEntry,
+          bo: boEntry,
+        });
+      } else {
+        formData.setValues({
+          fi: fiFormShape,
+          rc: rcFormShape,
+          ca: [caFormShape],
+          bo: [boFormShape],
+        });
       }
     }
   }, []);
@@ -82,7 +121,9 @@ const Form = ({
     return () => clearTimeout(timer);
   }, [formData.values]);
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    const res = await saveForm(businessId, formId, activeTab, formData.values);
+    console.log(res);
     if (
       activeTab === 3 &&
       !formData.errors.bo &&

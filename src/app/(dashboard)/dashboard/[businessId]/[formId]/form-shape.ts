@@ -1,8 +1,9 @@
 import { caFormInterface } from "@/types";
 import { boFormInterface } from "@/types/form-types";
+import { FilingType } from "@prisma/client";
 
 export const fiFormShape = {
-  filingType: "",
+  filingType: "INITIAL" as FilingType,
   legalName: "",
   taxType: "",
   taxId: "",

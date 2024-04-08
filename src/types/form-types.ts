@@ -1,5 +1,7 @@
+import { FilingType } from "@prisma/client";
+
 export interface fiFormInterface {
-  filingType: string;
+  filingType: FilingType;
   legalName: string;
   taxType: string;
   taxId: string;

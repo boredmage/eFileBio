@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { redirect } from "next/navigation";
 import { Business, Form as FormType } from "@prisma/client";
+import { iFullFormType } from "@/types";
 
 async function getFormData(
   businessId: string,
@@ -22,6 +23,8 @@ async function getFormData(
     },
     include: {
       business: true,
+      fi: true,
+      rc: true,
     },
   });
 
@@ -50,7 +53,7 @@ const page = async ({
     return redirect("/dashboard");
   }
 
-  const form: FormType = formData;
+  const form: iFullFormType = formData;
   const business: Business = formData.business;
 
   return (
