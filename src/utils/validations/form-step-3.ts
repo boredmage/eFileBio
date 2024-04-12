@@ -22,7 +22,7 @@ const formStep3Validation = Yup.array().of(
       zip: Yup.string().required("ZIP code is required"),
       identification: Yup.object().shape({
         type: Yup.string().required("Identifying document type is required"),
-        id: Yup.string().required(
+        ID: Yup.string().required(
           "Identifying document issuing ID number is required",
         ),
         jurisdiction: Yup.string().required("Country is required"),

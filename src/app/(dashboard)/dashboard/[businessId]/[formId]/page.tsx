@@ -25,6 +25,12 @@ async function getFormData(
       business: true,
       fi: true,
       rc: true,
+      ca: {
+        include: {
+          identification: true,
+          identifyingDocument: true,
+        },
+      },
     },
   });
 

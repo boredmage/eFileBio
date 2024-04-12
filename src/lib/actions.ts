@@ -7,6 +7,7 @@ import { z } from "zod";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import {
+  caFormShape,
   fiFormShape,
   rcFormShape,
 } from "@/app/(dashboard)/dashboard/[businessId]/[formId]/form-shape";
@@ -155,8 +156,6 @@ export async function createForm(data: { businessId: string }) {
       },
     },
   });
-
-  return newForm;
 
   revalidatePath(`/dashboard/${businessId}`);
   redirect(`/dashboard/${businessId}/${newForm.id}`);

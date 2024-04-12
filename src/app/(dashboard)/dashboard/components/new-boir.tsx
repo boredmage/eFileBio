@@ -14,8 +14,7 @@ const NewBoir = ({ businessId }: { businessId: string }) => {
   const handleNewBoir = async () => {
     try {
       setIsLoading(true);
-      const newForm = await createForm({ businessId });
-      console.log(newForm);
+      await createForm({ businessId });
     } catch (error) {
     } finally {
       setIsLoading(false);

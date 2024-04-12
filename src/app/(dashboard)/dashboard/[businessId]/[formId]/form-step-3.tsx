@@ -263,7 +263,7 @@ const SectionForm = ({
               {...getFieldProps(`ca.${level}.dob`)}
               isReadOnly={isPreview}
               isInvalid={caTouched?.dob && !!caError?.dob}
-              errorMessage={caTouched?.dob && caError?.dob}
+              errorMessage={!!caTouched?.dob && !!caError?.dob}
             />
           </div>
         </div>
@@ -276,6 +276,7 @@ const SectionForm = ({
             </h2>
             <RadioCheckbox
               name={`ca.${level}.addressType`}
+              isReadOnly={isPreview}
               values={[
                 { label: "Business address", value: "BUSINESS" },
                 { label: "Residential address", value: "RESIDENTIAL" },
@@ -393,13 +394,13 @@ const SectionForm = ({
             <FormInput
               label="Identifying document number"
               isRequired
-              {...getFieldProps(`ca.${level}.identification.id`)}
+              {...getFieldProps(`ca.${level}.identification.ID`)}
               isReadOnly={isPreview}
               isInvalid={
-                caTouched?.identification?.id && !!caError?.identification?.id
+                caTouched?.identification?.ID && !!caError?.identification?.ID
               }
               errorMessage={
-                caTouched?.identification?.id && caError?.identification?.id
+                caTouched?.identification?.ID && caError?.identification?.ID
               }
             />
           </div>{" "}

@@ -49,6 +49,7 @@ const Form = ({
     onOpen: fileOpenHandler,
     onOpenChange: modalOpenChangeHandler,
   } = useDisclosure();
+  const isFormReadOnly = form.status !== "DRAFT";
 
   const formData = useFormik<iFormType>({
     initialValues: {
@@ -59,11 +60,12 @@ const Form = ({
     },
     validationSchema: formValidation,
     onSubmit: (values) => {
-      console.log(JSON.stringify(values, null, 2));
+      // console.log(JSON.stringify(values, null, 2));
     },
   });
 
   useEffect(() => {
+    // console.log(JSON.stringify(form, null, 2));
     if (businessId && formId) {
       const savedData = localStorage.getItem(
         (businessId as string).concat(formId as string),
@@ -81,14 +83,15 @@ const Form = ({
       const { fi, rc, ca, bo } = JSON.parse(savedData) as iFormType;
       const fiEntry = fi ?? fiFormShape;
       const rcEntry = rc ?? rcFormShape;
-      const caEntry = ca ?? [caFormShape];
+      const caEntry = ca.length ? ca : [caFormShape];
       const boEntry = bo ?? [boFormShape];
 
       if (form) {
         formData.setValues({
           fi: form.fi ?? fiEntry,
           rc: form.rc ?? rcEntry,
-          ca: caEntry,
+          // @ts-expect-error
+          ca: form.ca.length ? form.ca : caEntry,
           bo: boEntry,
         });
       } else if (savedData) {
@@ -122,32 +125,48 @@ const Form = ({
   }, [formData.values]);
 
   const handleNext = async () => {
-    const res = await saveForm(businessId, formId, activeTab, formData.values);
-    console.log(res);
-    if (
-      activeTab === 3 &&
-      !formData.errors.bo &&
-      !formData.errors.ca &&
-      !formData.errors.fi &&
-      !formData.errors.rc
-    ) {
-      fileOpenHandler();
-    } else {
-      formData.handleSubmit();
-    }
+    try {
+      if (isFormReadOnly) {
+        if (activeTab === 3) {
+          setActiveTab(0);
+        } else {
+          setActiveTab((currentIndex) => currentIndex + 1);
+        }
+        return;
+      }
 
-    if (activeTab === 0 && !formData.errors.fi) {
-      setActiveTab((currentIndex) => currentIndex + 1);
-      formData.setErrors({});
-      formData.setTouched({});
-    } else if (activeTab === 1 && !formData.errors.rc) {
-      setActiveTab((currentIndex) => currentIndex + 1);
-      formData.setErrors({});
-      formData.setTouched({});
-    } else if (activeTab === 2 && !formData.errors.ca) {
-      setActiveTab((currentIndex) => currentIndex + 1);
-      formData.setErrors({});
-      formData.setTouched({});
+      if (
+        activeTab === 3 &&
+        !formData.errors.bo &&
+        !formData.errors.ca &&
+        !formData.errors.fi &&
+        !formData.errors.rc
+      ) {
+        await saveForm(businessId, formId, activeTab, formData.values);
+        fileOpenHandler();
+      } else {
+        formData.handleSubmit();
+      }
+
+      if (activeTab === 0 && !formData.errors.fi) {
+        setActiveTab((currentIndex) => currentIndex + 1);
+        formData.setErrors({});
+        formData.setTouched({});
+        await saveForm(businessId, formId, activeTab, formData.values);
+      } else if (activeTab === 1 && !formData.errors.rc) {
+        setActiveTab((currentIndex) => currentIndex + 1);
+        formData.setErrors({});
+        formData.setTouched({});
+        await saveForm(businessId, formId, activeTab, formData.values);
+      } else if (activeTab === 2 && !formData.errors.ca) {
+        setActiveTab((currentIndex) => currentIndex + 1);
+        formData.setErrors({});
+        formData.setTouched({});
+        await saveForm(businessId, formId, activeTab, formData.values);
+      }
+    } catch (error) {
+      console.log(error);
+      alert("An error occurred. Please try again.");
     }
   };
   const handleBack = () => setActiveTab((currentIndex) => currentIndex - 1);
@@ -192,21 +211,25 @@ const Form = ({
             <FormSteps.FormStep1
               formData={formData as FormikProps<iFormType>}
               datePrepared={form.createdAt}
+              isPreview={isFormReadOnly}
             />
           )}
           {activeTab === 1 && (
             <FormSteps.FormStep2
               formData={formData as FormikProps<iFormType>}
+              isPreview={isFormReadOnly}
             />
           )}
           {activeTab === 2 && (
             <FormSteps.FormStep3
               formData={formData as FormikProps<iFormType>}
+              isPreview={isFormReadOnly}
             />
           )}
           {activeTab === 3 && (
             <FormSteps.FormStep4
               formData={formData as FormikProps<iFormType>}
+              isPreview={isFormReadOnly}
             />
           )}
         </div>

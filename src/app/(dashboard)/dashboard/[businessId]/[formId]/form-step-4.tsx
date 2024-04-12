@@ -1,7 +1,6 @@
 import FormDate from "@/components/form-date";
 import FormInput from "@/components/form-input";
 import FormSelect from "@/components/form-select";
-import RadioCheckbox from "@/components/radio-checkbox";
 import {
   identifyingDocumentTypes,
   priorityCountries,
@@ -10,14 +9,7 @@ import {
   domesticStates,
   foreignCountries,
 } from "@/utils/constants";
-import {
-  Accordion,
-  AccordionItem,
-  Avatar,
-  Button,
-  Checkbox,
-  Divider,
-} from "@nextui-org/react";
+import { Accordion, AccordionItem, Checkbox, Divider } from "@nextui-org/react";
 import clsx from "clsx";
 import { FormikErrors, FormikProps } from "formik";
 import { LoaderCircle, Minus, Plus, Trash2 } from "lucide-react";
@@ -217,7 +209,7 @@ const SectionForm = ({
             <div className="py-6">
               <Checkbox
                 color="warning"
-                isSelected={boValue.isParentGuardianInformation}
+                isSelected={Boolean(boValue.isParentGuardianInformation)}
                 className="items-start"
                 classNames={{
                   icon: "text-white",
@@ -359,7 +351,7 @@ const SectionForm = ({
                   errorMessage={caTouched?.city && caError?.city}
                 />
                 <FormSelect
-                  listContent={getStateForCountry(boValue.country)}
+                  listContent={getStateForCountry(boValue.country!)}
                   label="State"
                   isRequired
                   name={`bo.${level}.state`}
@@ -430,14 +422,14 @@ const SectionForm = ({
                 <FormInput
                   label="Identifying document number"
                   isRequired
-                  {...getFieldProps(`bo.${level}.identification.id`)}
+                  {...getFieldProps(`bo.${level}.identification.ID`)}
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.id &&
-                    !!caError?.identification?.id
+                    caTouched?.identification?.ID &&
+                    !!caError?.identification?.ID
                   }
                   errorMessage={
-                    caTouched?.identification?.id && caError?.identification?.id
+                    caTouched?.identification?.ID && caError?.identification?.ID
                   }
                 />
               </div>{" "}
@@ -498,7 +490,8 @@ const SectionForm = ({
                       !["37", "38"].includes(boValue.identification.type)) ||
                     !!boValue.identification.localTribal ||
                     (isPriorityJurisdiction &&
-                      boValue.identification.jurisdiction !== "US")
+                      boValue.identification.jurisdiction !== "US") ||
+                    boValue.identification.type === "40"
                   }
                   isReadOnly={isPreview}
                   isInvalid={

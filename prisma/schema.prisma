@@ -97,6 +97,8 @@ model Form {
   status     FillingStatus @default(DRAFT)
   fi         FiForm?
   rc         RcForm?
+  ca         caForm[]
+  bo         boForm[]
 }
 
 model FiForm {
@@ -137,4 +139,80 @@ model RcForm {
   city                             String
   state                            String
   zip                              String
+}
+
+enum AddressType {
+  BUSINESS
+  RESIDENTIAL
+}
+
+model caForm {
+  id                    String              @id @default(cuid())
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  form                  Form                @relation(fields: [formId], references: [id])
+  formId                String
+  fincenId              String
+  lastName              String
+  middleName            String
+  firstName             String
+  suffix                String
+  dob                   DateTime
+  addressType           AddressType
+  country               String
+  state                 String
+  address               String
+  city                  String
+  zip                   String
+  identification        Identification      @relation(fields: [identificationId], references: [id])
+  identificationId      String              @unique @map("identificationId")
+  identifyingDocument   IdentifyingDocument @relation(fields: [identifyingDocumentId], references: [id])
+  identifyingDocumentId String              @unique @map("identifyingDocumentId")
+}
+
+model boForm {
+  id                          String               @id @default(cuid())
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @updatedAt
+  form                        Form                 @relation(fields: [formId], references: [id])
+  formId                      String               @unique
+  isParentGuardianInformation Boolean?
+  fincenId                    String?
+  isExemptEntity              Boolean
+  lastName                    String
+  middleName                  String?
+  firstName                   String?
+  suffix                      String?
+  dob                         DateTime?
+  country                     String?
+  state                       String?
+  address                     String?
+  city                        String?
+  zip                         String?
+  identification              Identification?      @relation(fields: [identificationId], references: [id])
+  identificationId            String?              @unique @map("identificationId")
+  identifyingDocument         IdentifyingDocument? @relation(fields: [identifyingDocumentId], references: [id])
+  identifyingDocumentId       String?              @unique @map("identifyingDocumentId")
+}
+
+model Identification {
+  id           String  @id @default(cuid())
+  type         String
+  ID           String
+  jurisdiction String
+  state        String?
+  localTribal  String?
+  otherTribe   String?
+  image        String
+  caForm       caForm?
+  boForm       boForm?
+}
+
+model IdentifyingDocument {
+  id     String  @id @default(cuid())
+  name   String
+  size   Int
+  type   String
+  caForm caForm?
+  boForm boForm?
 }

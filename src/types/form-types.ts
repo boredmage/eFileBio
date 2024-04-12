@@ -1,65 +1,30 @@
-import { FilingType } from "@prisma/client";
+import {
+  FiForm,
+  Identification,
+  IdentifyingDocument,
+  RcForm,
+  boForm,
+  caForm,
+} from "@prisma/client";
 
-export interface fiFormInterface {
-  filingType: FilingType;
-  legalName: string;
-  taxType: string;
-  taxId: string;
-  taxJurisdiction: string;
-}
+type OmitData = "createdAt" | "updatedAt" | "formId";
+type OmitMultiple<T, K extends keyof T> = Omit<T, K>;
 
-export interface rcFormInterface {
-  isForeignPooledInvestmentVehicle: boolean;
-  isRequestingId: boolean;
-  legalName: string;
-  alternateNames: string[];
-  taxType: string;
-  taxId: string;
-  taxJurisdiction: string;
-  jurisdiction: string;
-  domesticState: string;
-  domesticTribalJurisdiction: string;
-  domesticOtherTribe: string;
-  foreignFirstState: string;
-  foreignTribalJurisdiction: string;
-  foreignOtherTribe: string;
-  country: string;
-  address: string;
-  city: string;
-  state: string;
-  zip: string;
-}
+export type fiFormInterface = OmitMultiple<FiForm, OmitData>;
 
-export interface caFormInterface {
-  fincenId: string;
-  lastName: string;
-  middleName: string;
-  firstName: string;
-  suffix: string;
-  dob: string;
-  addressType: string;
-  country: string;
-  state: string;
-  address: string;
-  city: string;
-  zip: string;
-  identification: {
-    type: string;
-    id: string;
-    jurisdiction: string;
-    state: string;
-    localTribal: string;
-    otherTribe: string;
-    image: string;
-  };
-  identifyingDocument: {
-    name: string;
-    size: number;
-    type: string;
-  };
-}
+export type rcFormInterface = OmitMultiple<RcForm, OmitData>;
 
-export interface boFormInterface extends Omit<caFormInterface, "addressType"> {
-  isParentGuardianInformation: boolean;
-  isExemptEntity: boolean;
-}
+export type caFormInterface = OmitMultiple<
+  caForm & {
+    identification: Identification;
+    identifyingDocument: IdentifyingDocument;
+  },
+  OmitData | "identificationId" | "identifyingDocumentId"
+>;
+export type boFormInterface = OmitMultiple<
+  boForm & {
+    identification: Identification;
+    identifyingDocument: IdentifyingDocument;
+  },
+  OmitData | "identificationId" | "identifyingDocumentId"
+>;

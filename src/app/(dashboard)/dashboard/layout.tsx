@@ -21,7 +21,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </p>
           </div>
           {Object.keys(params)[0] === "businessId" && (
-            <NewBoir businessId={params.businessId as string} />
+            <div>
+              <NewBoir businessId={params.businessId as string} />
+            </div>
           )}
         </div>
       )}

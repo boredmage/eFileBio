@@ -35,13 +35,13 @@ const formStep4Validation = Yup.array().of(
             type: Yup.string().required(
               "Identifying document type is required",
             ),
-            id: Yup.string().required(
+            ID: Yup.string().required(
               "Identifying document issuing ID number is required",
             ),
             jurisdiction: Yup.string().required("Country is required"),
             state: Yup.string().when(["type", "localTribe"], {
               is: (type: string, tribe: string) =>
-                type === "37" || (type === "38" && !tribe),
+                type === "37" || (type === "38" && tribe),
               then: (schema) => schema.required("State is required"),
               otherwise: (schema) => schema.notRequired(),
             }),

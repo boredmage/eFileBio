@@ -1,16 +1,22 @@
 import { caFormInterface } from "@/types";
-import { boFormInterface } from "@/types/form-types";
-import { FilingType } from "@prisma/client";
+import {
+  boFormInterface,
+  fiFormInterface,
+  rcFormInterface,
+} from "@/types/form-types";
+import { AddressType } from "@prisma/client";
 
-export const fiFormShape = {
-  filingType: "INITIAL" as FilingType,
+export const fiFormShape: fiFormInterface = {
+  id: "",
+  filingType: "INITIAL",
   legalName: "",
   taxType: "",
   taxId: "",
   taxJurisdiction: "",
 };
 
-export const rcFormShape = {
+export const rcFormShape: rcFormInterface = {
+  id: "",
   isForeignPooledInvestmentVehicle: false,
   isRequestingId: false,
   legalName: "",
@@ -33,21 +39,23 @@ export const rcFormShape = {
 };
 
 export const caFormShape: caFormInterface = {
+  id: "",
   fincenId: "",
   lastName: "",
   middleName: "",
   firstName: "",
   suffix: "",
-  dob: "",
-  addressType: "",
+  dob: "" as unknown as Date,
+  addressType: "" as AddressType,
   country: "",
   state: "",
   address: "",
   city: "",
   zip: "",
   identification: {
-    type: "",
     id: "",
+    type: "",
+    ID: "",
     jurisdiction: "",
     state: "",
     localTribal: "",
@@ -55,6 +63,7 @@ export const caFormShape: caFormInterface = {
     image: "",
   },
   identifyingDocument: {
+    id: "",
     name: "",
     size: 0,
     type: "",
@@ -62,6 +71,7 @@ export const caFormShape: caFormInterface = {
 };
 
 export const boFormShape: boFormInterface = {
+  id: "",
   isParentGuardianInformation: false,
   fincenId: "",
   isExemptEntity: false,
@@ -69,15 +79,16 @@ export const boFormShape: boFormInterface = {
   middleName: "",
   firstName: "",
   suffix: "",
-  dob: "",
+  dob: null,
   country: "",
   state: "",
   address: "",
   city: "",
   zip: "",
   identification: {
-    type: "",
     id: "",
+    type: "",
+    ID: "",
     jurisdiction: "",
     state: "",
     localTribal: "",
@@ -85,6 +96,7 @@ export const boFormShape: boFormInterface = {
     image: "",
   },
   identifyingDocument: {
+    id: "",
     name: "",
     size: 0,
     type: "",
