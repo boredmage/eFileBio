@@ -23,8 +23,8 @@ export type caFormInterface = OmitMultiple<
 >;
 export type boFormInterface = OmitMultiple<
   boForm & {
-    identification: Identification;
-    identifyingDocument: IdentifyingDocument;
+    identification: Identification | null;
+    identifyingDocument: IdentifyingDocument | null;
   },
   OmitData | "identificationId" | "identifyingDocumentId"
 >;

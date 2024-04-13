@@ -11,7 +11,7 @@ import {
 } from "@/utils/constants";
 import { Accordion, AccordionItem, Checkbox, Divider } from "@nextui-org/react";
 import clsx from "clsx";
-import { FormikErrors, FormikProps } from "formik";
+import { FormikErrors, FormikProps, FormikTouched } from "formik";
 import { LoaderCircle, Minus, Plus, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { boFormShape } from "./form-shape";
@@ -22,6 +22,10 @@ import IdentifyingDocument, {
 } from "../../components/identifying-document";
 import { UploadButton } from "@/utils/uploadthing";
 import { ClientUploadedFileData } from "uploadthing/types";
+import {
+  Identification,
+  IdentifyingDocument as iIdentifyingDocument,
+} from "@prisma/client";
 
 const FormStep4 = ({
   formData,
@@ -105,8 +109,18 @@ const SectionForm = ({
   const { bo: error } = errors;
 
   const boValue = value[level];
-  const boTouched = touch?.[level];
-  const boError = (error?.[level] || {}) as FormikErrors<boFormInterface>;
+  const boTouched = touch?.[level] as FormikTouched<
+    boFormInterface & {
+      identification: Identification;
+      identifyingDocument: iIdentifyingDocument;
+    }
+  >;
+  const boError = (error?.[level] || {}) as FormikErrors<
+    boFormInterface & {
+      identification: Identification;
+      identifyingDocument: iIdentifyingDocument;
+    }
+  >;
 
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
 
@@ -138,7 +152,7 @@ const SectionForm = ({
   };
 
   const getCountryForJurisdiction = () => {
-    const type = boValue.identification.type;
+    const type = boValue.identification?.type as string;
 
     if (["37", "38"].includes(type)) {
       return priorityCountries;
@@ -384,7 +398,7 @@ const SectionForm = ({
                   label="Identifying document type"
                   name={`bo.${level}.identification.type`}
                   isRequired
-                  selectedKey={boValue.identification.type}
+                  selectedKey={boValue.identification?.type}
                   setFieldValue={(field, value) => {
                     setFieldValue(
                       `bo.${level}.identification.jurisdiction`,
@@ -443,7 +457,7 @@ const SectionForm = ({
                   label="Country/Jurisdiction"
                   isRequired
                   name={`bo.${level}.identification.jurisdiction`}
-                  selectedKey={boValue.identification.jurisdiction}
+                  selectedKey={boValue.identification?.jurisdiction}
                   setFieldValue={(field, value) => {
                     setFieldValue(`bo.${level}.identification.state`, "");
                     setFieldValue(`bo.${level}.identification.otherTribe`, "");
@@ -472,26 +486,26 @@ const SectionForm = ({
                     boError?.identification?.jurisdiction
                   }
                   isDisabled={
-                    boValue.identification.jurisdiction === "US" &&
-                    boValue.identification.type === "39"
+                    boValue.identification?.jurisdiction === "US" &&
+                    boValue.identification?.type === "39"
                   }
                 />
                 <FormSelect
                   listContent={getStateForCountry(
-                    boValue.identification.jurisdiction,
+                    boValue.identification?.jurisdiction ?? "",
                   )}
                   label="State"
                   isRequired
                   name={`bo.${level}.identification.state`}
-                  selectedKey={boValue.identification.state}
+                  selectedKey={boValue.identification?.state}
                   setFieldValue={setFieldValue}
                   isDisabled={
-                    (!!boValue.identification.jurisdiction &&
-                      !["37", "38"].includes(boValue.identification.type)) ||
-                    !!boValue.identification.localTribal ||
+                    (!!boValue.identification?.jurisdiction &&
+                      !["37", "38"].includes(boValue.identification?.type)) ||
+                    !!boValue.identification?.localTribal ||
                     (isPriorityJurisdiction &&
-                      boValue.identification.jurisdiction !== "US") ||
-                    boValue.identification.type === "40"
+                      boValue.identification?.jurisdiction !== "US") ||
+                    boValue.identification?.type === "40"
                   }
                   isReadOnly={isPreview}
                   isInvalid={
@@ -510,11 +524,11 @@ const SectionForm = ({
                   label="Local/Tribal"
                   isRequired
                   name={`bo.${level}.identification.localTribal`}
-                  selectedKey={boValue.identification.localTribal}
+                  selectedKey={boValue.identification?.localTribal}
                   setFieldValue={setFieldValue}
                   isDisabled={
-                    boValue.identification.type !== "38" ||
-                    !!boValue.identification.state
+                    boValue.identification?.type !== "38" ||
+                    !!boValue.identification?.state
                   }
                   isReadOnly={isPreview}
                   isInvalid={
@@ -530,7 +544,7 @@ const SectionForm = ({
                   label="Other local/Tribal description"
                   isRequired
                   {...getFieldProps(`bo.${level}.identification.otherTribe`)}
-                  isDisabled={boValue.identification.localTribal !== "Other"}
+                  isDisabled={boValue.identification?.localTribal !== "Other"}
                   isReadOnly={isPreview}
                   isInvalid={
                     boTouched?.identification?.otherTribe &&
@@ -587,11 +601,17 @@ const SectionForm = ({
                 </div>
               )}
               {isUploadingDoc && <IdentifyingDocumentLoader />}
-              {boValue.identification.image && !isUploadingDoc && (
+              {boValue.identification?.image && !isUploadingDoc && (
                 <IdentifyingDocument
-                  identifyingDocumentName={boValue.identifyingDocument.name}
-                  identifyingDocumentType={boValue.identifyingDocument.type}
-                  identifyingDocumentSize={boValue.identifyingDocument.size}
+                  identifyingDocumentName={
+                    boValue.identifyingDocument?.name ?? ""
+                  }
+                  identifyingDocumentType={
+                    boValue.identifyingDocument?.type ?? ""
+                  }
+                  identifyingDocumentSize={
+                    boValue.identifyingDocument?.size ?? 0
+                  }
                   isReadOnly={isPreview}
                   identifyingDocumentResetHandler={() => {
                     setFieldValue(`bo.${level}.identification.image`, "");
