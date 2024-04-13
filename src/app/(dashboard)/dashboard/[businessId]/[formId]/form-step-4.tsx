@@ -105,8 +105,8 @@ const SectionForm = ({
   const { bo: error } = errors;
 
   const boValue = value[level];
-  const caTouched = touch?.[level];
-  const caError = (error?.[level] || {}) as FormikErrors<boFormInterface>;
+  const boTouched = touch?.[level];
+  const boError = (error?.[level] || {}) as FormikErrors<boFormInterface>;
 
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
 
@@ -275,8 +275,8 @@ const SectionForm = ({
                   isRequired
                   {...getFieldProps(`bo.${level}.firstName`)}
                   isReadOnly={isPreview}
-                  isInvalid={caTouched?.firstName && !!caError?.firstName}
-                  errorMessage={caTouched?.firstName && caError?.firstName}
+                  isInvalid={boTouched?.firstName && !!boError?.firstName}
+                  errorMessage={boTouched?.firstName && boError?.firstName}
                 />
                 <FormInput
                   label="Middle name"
@@ -290,8 +290,8 @@ const SectionForm = ({
               isRequired
               {...getFieldProps(`bo.${level}.lastName`)}
               isReadOnly={isPreview}
-              isInvalid={caTouched?.lastName && !!caError?.lastName}
-              errorMessage={caTouched?.lastName && caError?.lastName}
+              isInvalid={boTouched?.lastName && !!boError?.lastName}
+              errorMessage={boTouched?.lastName && boError?.lastName}
             />
           </div>
           {!boValue.isExemptEntity && (
@@ -308,8 +308,8 @@ const SectionForm = ({
                 setFieldValue={setFieldValue}
                 {...getFieldProps(`bo.${level}.dob`)}
                 isReadOnly={isPreview}
-                isInvalid={caTouched?.dob && !!caError?.dob}
-                errorMessage={caTouched?.dob && caError?.dob}
+                isInvalid={boTouched?.dob && !!boError?.dob}
+                errorMessage={boTouched?.dob && boError?.dob}
               />
             </div>
           )}
@@ -329,16 +329,16 @@ const SectionForm = ({
                   setFieldValue={setFieldValue}
                   onBlur={handleBlur}
                   isReadOnly={isPreview}
-                  isInvalid={caTouched?.country && !!caError?.country}
-                  errorMessage={caTouched?.country && caError?.country}
+                  isInvalid={boTouched?.country && !!boError?.country}
+                  errorMessage={boTouched?.country && boError?.country}
                 />
                 <FormInput
                   label="Address (number, street, and apt. or suite no.)"
                   isRequired
                   {...getFieldProps(`bo.${level}.address`)}
                   isReadOnly={isPreview}
-                  isInvalid={caTouched?.address && !!caError?.address}
-                  errorMessage={caTouched?.address && caError?.address}
+                  isInvalid={boTouched?.address && !!boError?.address}
+                  errorMessage={boTouched?.address && boError?.address}
                 />
               </div>
               <div className="grid grid-cols-3 gap-6">
@@ -347,8 +347,8 @@ const SectionForm = ({
                   isRequired
                   {...getFieldProps(`bo.${level}.city`)}
                   isReadOnly={isPreview}
-                  isInvalid={caTouched?.city && !!caError?.city}
-                  errorMessage={caTouched?.city && caError?.city}
+                  isInvalid={boTouched?.city && !!boError?.city}
+                  errorMessage={boTouched?.city && boError?.city}
                 />
                 <FormSelect
                   listContent={getStateForCountry(boValue.country!)}
@@ -359,8 +359,8 @@ const SectionForm = ({
                   setFieldValue={setFieldValue}
                   onBlur={handleBlur}
                   isReadOnly={isPreview}
-                  isInvalid={caTouched?.state && !!caError?.state}
-                  errorMessage={caTouched?.state && caError?.state}
+                  isInvalid={boTouched?.state && !!boError?.state}
+                  errorMessage={boTouched?.state && boError?.state}
                   isDisabled={!isUnitedStates && !!boValue.country}
                 />
                 <FormInput
@@ -368,8 +368,8 @@ const SectionForm = ({
                   isRequired
                   {...getFieldProps(`bo.${level}.zip`)}
                   isReadOnly={isPreview}
-                  isInvalid={caTouched?.zip && !!caError?.zip}
-                  errorMessage={caTouched?.zip && caError?.zip}
+                  isInvalid={boTouched?.zip && !!boError?.zip}
+                  errorMessage={boTouched?.zip && boError?.zip}
                 />
               </div>
             </div>
@@ -411,12 +411,12 @@ const SectionForm = ({
                   onBlur={handleBlur}
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.type &&
-                    !!caError?.identification?.type
+                    boTouched?.identification?.type &&
+                    !!boError?.identification?.type
                   }
                   errorMessage={
-                    caTouched?.identification?.type &&
-                    caError?.identification?.type
+                    boTouched?.identification?.type &&
+                    boError?.identification?.type
                   }
                 />
                 <FormInput
@@ -425,11 +425,11 @@ const SectionForm = ({
                   {...getFieldProps(`bo.${level}.identification.ID`)}
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.ID &&
-                    !!caError?.identification?.ID
+                    boTouched?.identification?.ID &&
+                    !!boError?.identification?.ID
                   }
                   errorMessage={
-                    caTouched?.identification?.ID && caError?.identification?.ID
+                    boTouched?.identification?.ID && boError?.identification?.ID
                   }
                 />
               </div>{" "}
@@ -464,12 +464,12 @@ const SectionForm = ({
                   }}
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.jurisdiction &&
-                    !!caError?.identification?.jurisdiction
+                    boTouched?.identification?.jurisdiction &&
+                    !!boError?.identification?.jurisdiction
                   }
                   errorMessage={
-                    caTouched?.identification?.jurisdiction &&
-                    caError?.identification?.jurisdiction
+                    boTouched?.identification?.jurisdiction &&
+                    boError?.identification?.jurisdiction
                   }
                   isDisabled={
                     boValue.identification.jurisdiction === "US" &&
@@ -495,12 +495,12 @@ const SectionForm = ({
                   }
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.state &&
-                    !!caError?.identification?.state
+                    boTouched?.identification?.state &&
+                    !!boError?.identification?.state
                   }
                   errorMessage={
-                    caTouched?.identification?.state &&
-                    caError?.identification?.state
+                    boTouched?.identification?.state &&
+                    boError?.identification?.state
                   }
                 />
               </div>
@@ -518,12 +518,12 @@ const SectionForm = ({
                   }
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.localTribal &&
-                    !!caError?.identification?.localTribal
+                    boTouched?.identification?.localTribal &&
+                    !!boError?.identification?.localTribal
                   }
                   errorMessage={
-                    caTouched?.identification?.localTribal &&
-                    caError?.identification?.localTribal
+                    boTouched?.identification?.localTribal &&
+                    boError?.identification?.localTribal
                   }
                 />
                 <FormInput
@@ -533,12 +533,12 @@ const SectionForm = ({
                   isDisabled={boValue.identification.localTribal !== "Other"}
                   isReadOnly={isPreview}
                   isInvalid={
-                    caTouched?.identification?.otherTribe &&
-                    !!caError?.identification?.otherTribe
+                    boTouched?.identification?.otherTribe &&
+                    !!boError?.identification?.otherTribe
                   }
                   errorMessage={
-                    caTouched?.identification?.otherTribe &&
-                    caError?.identification?.otherTribe
+                    boTouched?.identification?.otherTribe &&
+                    boError?.identification?.otherTribe
                   }
                 />
               </div>
@@ -552,10 +552,10 @@ const SectionForm = ({
                       Identifying document{" "}
                       <span className="text-red-500">*</span>
                     </h2>
-                    {caTouched?.identification?.image &&
-                      caError?.identification?.image && (
+                    {boTouched?.identification?.image &&
+                      boError?.identification?.image && (
                         <p className="text-sm text-red-500">
-                          {caError.identification.image}
+                          {boError.identification.image}
                         </p>
                       )}
                   </div>
