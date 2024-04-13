@@ -101,62 +101,65 @@ export async function createBusiness(business: {
 }
 
 export async function createForm(data: { businessId: string }) {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  const { businessId } = data;
+    const { businessId } = data;
 
-  if (!session || !session.user || !session.user.email) {
-    return redirect("/");
-  }
+    if (!session || !session.user || !session.user.email) {
+      return redirect("/");
+    }
 
-  const user = await prisma.user.findUnique({
-    where: { email: session.user.email },
-  });
-
-  if (!user) {
-    return redirect("/");
-  }
-
-  if (!businessId) {
-    return new Response("Business ID is required", {
-      status: 400,
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
     });
-  }
 
-  const business = await prisma.business.findUnique({
-    where: { id: businessId },
-  });
+    if (!user) {
+      return redirect("/");
+    }
 
-  if (!business) {
-    return new Response("Business not found", {
-      status: 404,
+    if (!businessId) {
+      return new Response("Business ID is required", {
+        status: 400,
+      });
+    }
+
+    const business = await prisma.business.findUnique({
+      where: { id: businessId },
     });
+
+    if (!business) {
+      return new Response("Business not found", {
+        status: 404,
+      });
+    }
+
+    const formCount = await prisma.form.count({
+      where: {
+        businessId: business.id,
+      },
+    });
+
+    const newForm = await prisma.form.create({
+      data: {
+        ownerId: user.id,
+        version: formCount + 1,
+        businessId: business.id,
+        // fi: {
+        //   create: {
+        //     ...fiFormShape,
+        //   },
+        // },
+        // rc: {
+        //   create: {
+        //     ...rcFormShape,
+        //   },
+        // },
+      },
+    });
+    revalidatePath(`/dashboard/${businessId}`);
+    // redirect(`/dashboard/${businessId}/${newForm.id}`);
+  } catch (error) {
+    console.log(error);
   }
-
-  const formCount = await prisma.form.count({
-    where: {
-      businessId: business.id,
-    },
-  });
-
-  const newForm = await prisma.form.create({
-    data: {
-      ownerId: user.id,
-      version: formCount + 1,
-      businessId: business.id,
-      fi: {
-        create: {
-          ...fiFormShape,
-        },
-      },
-      rc: {
-        create: {
-          ...rcFormShape,
-        },
-      },
-    },
-  });
-
-  revalidatePath(`/dashboard/${businessId}`);
-  redirect(`/dashboard/${businessId}/${newForm.id}`);
 }

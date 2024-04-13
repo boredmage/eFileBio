@@ -4,11 +4,11 @@ import {
   fiFormInterface,
   rcFormInterface,
 } from "@/types/form-types";
-import { AddressType } from "@prisma/client";
+import { AddressType, FilingType } from "@prisma/client";
 
 export const fiFormShape: fiFormInterface = {
   id: "",
-  filingType: "INITIAL",
+  filingType: "" as FilingType,
   legalName: "",
   taxType: "",
   taxId: "",

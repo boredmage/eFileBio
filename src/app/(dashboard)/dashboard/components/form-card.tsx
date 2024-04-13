@@ -9,10 +9,11 @@ import {
   DropdownMenu,
   DropdownItem,
   Button,
-  cn,
   Chip,
 } from "@nextui-org/react";
-import { EllipsisVertical } from "lucide-react";
+import { Clock, EllipsisVertical } from "lucide-react";
+import { getDueDate } from "@/lib/utils";
+import { FillingStatus, FilingType } from "@prisma/client";
 
 const chipColor = {
   DRAFT: "warning",
@@ -24,6 +25,7 @@ const chipColor = {
 
 const FormCard = ({
   formId,
+  type,
   status,
   version,
   updatedAt,
@@ -31,12 +33,16 @@ const FormCard = ({
   businessCreationDate,
 }: {
   formId: string;
-  status: string;
+  type?: FilingType;
+  status: FillingStatus;
   version: number;
   updatedAt: Date;
   businessId: string;
   businessCreationDate: Date;
 }) => {
+  const initialBusinessDueDate = getDueDate(
+    businessCreationDate.toLocaleDateString("en-US"),
+  );
   return (
     <div className="relative">
       <FormMenu />
@@ -60,13 +66,32 @@ const FormCard = ({
               .join(" / ")}
           </p>
         </div>
-        <Chip
-          color={chipColor[status as keyof typeof chipColor]}
-          variant="dot"
-          className="absolute left-4 top-2 !mt-2 border-[0.5px] text-xs"
-        >
-          {status === "INREVIEW" ? "IN-REVIEW" : status}
-        </Chip>
+        {status === "DRAFT" && type === "INITIAL" ? (
+          <Chip
+            startContent={<Clock size={18} />}
+            variant="flat"
+            color={
+              initialBusinessDueDate > 10
+                ? "success"
+                : initialBusinessDueDate > 0
+                  ? "warning"
+                  : "danger"
+            }
+            className="absolute left-4 top-2 !mt-2 text-xs uppercase"
+          >
+            {initialBusinessDueDate > 0
+              ? `Due in ${initialBusinessDueDate} days`
+              : `${+initialBusinessDueDate} days overdue`}
+          </Chip>
+        ) : (
+          <Chip
+            color={chipColor[status as keyof typeof chipColor]}
+            variant="dot"
+            className="absolute left-4 top-2 !mt-2 border-[0.5px] text-xs"
+          >
+            {status === "INREVIEW" ? "IN-REVIEW" : status}
+          </Chip>
+        )}
       </Link>
     </div>
   );

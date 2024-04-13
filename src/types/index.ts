@@ -1,11 +1,14 @@
 import { Form, FiForm, RcForm, caForm } from "@prisma/client";
+import { boFormInterface, caFormInterface } from "./form-types";
 
 export type iFullFormType = Form & {
   fi: FiForm | null;
 } & {
   rc: RcForm | null;
 } & {
-  ca: caForm[];
+  ca: caFormInterface[];
+} & {
+  bo: boFormInterface[];
 };
 
 export type {

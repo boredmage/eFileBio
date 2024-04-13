@@ -31,6 +31,12 @@ async function getFormData(
           identifyingDocument: true,
         },
       },
+      bo: {
+        include: {
+          identification: true,
+          identifyingDocument: true,
+        },
+      },
     },
   });
 

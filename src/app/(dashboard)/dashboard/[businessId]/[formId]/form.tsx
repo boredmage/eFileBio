@@ -84,15 +84,14 @@ const Form = ({
       const fiEntry = fi ?? fiFormShape;
       const rcEntry = rc ?? rcFormShape;
       const caEntry = ca.length ? ca : [caFormShape];
-      const boEntry = bo ?? [boFormShape];
+      const boEntry = bo.length ? bo : [boFormShape];
 
       if (form) {
         formData.setValues({
           fi: form.fi ?? fiEntry,
           rc: form.rc ?? rcEntry,
-          // @ts-expect-error
           ca: form.ca.length ? form.ca : caEntry,
-          bo: boEntry,
+          bo: form.bo.length ? form.bo : boEntry,
         });
       } else if (savedData) {
         formData.setValues({

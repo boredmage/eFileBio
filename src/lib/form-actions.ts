@@ -5,6 +5,7 @@ import { getServerSession } from "next-auth";
 import { prisma } from "./db";
 import { iFormType } from "@/app/(dashboard)/dashboard/[businessId]/[formId]/form";
 import { AddressType } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 
 export const saveForm = async (
   businessId: string,
@@ -48,22 +49,29 @@ export const saveForm = async (
 
     const { fi, rc, ca, bo } = formData;
 
-    // Remove (formId, id, createdAt and updatedAt) from fi, rc, and ca
-    // @ts-expect-error
-    delete fi.formId;
-    // @ts-expect-error
-    delete rc.formId;
-    ca.forEach((entry) => {
+    [fi, rc].forEach((form) => {
       // @ts-expect-error
-      delete entry.formId;
+      delete form.formId;
       // @ts-expect-error
-      delete entry.id;
+      delete form.id;
+      // @ts-expect-error
+      delete form.createdAt;
+      // @ts-expect-error
+      delete form.updatedAt;
     });
-    bo.forEach((entry) => {
+
+    [ca, bo].forEach((forms) => {
       // @ts-expect-error
-      delete entry.formId;
-      // @ts-expect-error
-      delete entry.id;
+      delete forms.formId;
+
+      forms.forEach((form) => {
+        // @ts-expect-error
+        delete form.id;
+        // @ts-expect-error
+        delete form.createdAt;
+        // @ts-expect-error
+        delete form.updatedAt;
+      });
     });
 
     // Update the form accordingly
@@ -73,11 +81,15 @@ export const saveForm = async (
       },
       data: {
         fi: {
-          update: { ...fi },
+          upsert: {
+            create: { ...fi },
+            update: { ...fi },
+          },
         },
-        rc: {
-          update: { ...rc },
-        },
+        rc:
+          formStep > 0
+            ? { upsert: { create: { ...rc }, update: { ...rc } } }
+            : {},
         ca: {
           deleteMany: {
             formId,
@@ -148,31 +160,37 @@ export const saveForm = async (
                     bo.map(async (entry) => {
                       const { identification, identifyingDocument } = entry;
 
-                      const createdIdentification =
-                        await prisma.identification.upsert({
-                          where: {
-                            id: identification.id,
-                          },
-                          update: {
-                            ...identification,
-                          },
-                          create: {
-                            ...identification,
-                          },
-                        });
+                      let createdIdentification, createdIdentifyingDocument;
 
-                      const createdIdentifyingDocument =
-                        await prisma.identifyingDocument.upsert({
-                          where: {
-                            id: identifyingDocument.id,
-                          },
-                          update: {
-                            ...identifyingDocument,
-                          },
-                          create: {
-                            ...identifyingDocument,
-                          },
-                        });
+                      if (identification) {
+                        createdIdentification =
+                          await prisma.identification.upsert({
+                            where: {
+                              id: identification.id,
+                            },
+                            update: {
+                              ...identification,
+                            },
+                            create: {
+                              ...identification,
+                            },
+                          });
+                      }
+
+                      if (identifyingDocument) {
+                        createdIdentifyingDocument =
+                          await prisma.identifyingDocument.upsert({
+                            where: {
+                              id: identifyingDocument.id,
+                            },
+                            update: {
+                              ...identifyingDocument,
+                            },
+                            create: {
+                              ...identifyingDocument,
+                            },
+                          });
+                      }
 
                       if (entry.hasOwnProperty("identification")) {
                         // @ts-expect-error
@@ -187,8 +205,11 @@ export const saveForm = async (
                       return {
                         ...entry,
                         dob: new Date(entry.dob ? entry.dob : 0),
-                        identificationId: createdIdentification.id,
-                        identifyingDocumentId: createdIdentifyingDocument.id,
+                        identificationId:
+                          createdIdentification && createdIdentification.id,
+                        identifyingDocumentId:
+                          createdIdentifyingDocument &&
+                          createdIdentifyingDocument.id,
                       };
                     }),
                   )
@@ -200,9 +221,11 @@ export const saveForm = async (
         fi: true,
         rc: true,
         ca: true,
+        bo: true,
       },
     });
 
+    revalidatePath(`/dashboard/${businessId}`);
     return updatedForm;
   } catch (error) {
     console.error(error);

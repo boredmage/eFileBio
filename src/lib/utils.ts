@@ -28,3 +28,9 @@ export function getFileSize(size: number) {
     ["B", "KB", "MB", "GB", "TB"][i]
   );
 }
+
+export const getDueDate = (businessCreatedDate: string) =>
+  90 -
+  (new Date(new Date().toLocaleDateString("en-US")).getTime() -
+    new Date(businessCreatedDate).getTime()) /
+    86_400_000;

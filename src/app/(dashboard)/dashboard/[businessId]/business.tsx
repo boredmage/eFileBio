@@ -1,12 +1,21 @@
 import { prisma } from "@/lib/db";
 import { Avatar, Button } from "@nextui-org/react";
-import { Form } from "@prisma/client";
+// import { Form } from "@prisma/client";
 import { ArrowLeft } from "iconsax-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import FormCard from "../components/form-card";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
+import { FilingType, FillingStatus } from "@prisma/client";
+
+interface Form {
+  id: string;
+  updatedAt: Date;
+  version: number;
+  status: FillingStatus;
+  fi: { filingType: FilingType } | null;
+}
 
 async function getBusiness(businessId: string, userId: string) {
   const res = await prisma.business.findUnique({
@@ -19,7 +28,19 @@ async function getBusiness(businessId: string, userId: string) {
       id: true,
       name: true,
       logo: true,
-      forms: true,
+      forms: {
+        select: {
+          id: true,
+          status: true,
+          version: true,
+          updatedAt: true,
+          fi: {
+            select: {
+              filingType: true,
+            },
+          },
+        },
+      },
       description: true,
       creationDate: true,
     },
@@ -78,6 +99,7 @@ const Business = async ({ params }: { params: { businessId: string } }) => {
             <FormCard
               key={form.id}
               formId={form.id}
+              type={form.fi?.filingType}
               status={form.status}
               version={form.version}
               businessId={businessId}
