@@ -44,7 +44,7 @@ async function getForms() {
       updatedAt: true,
     },
     orderBy: {
-      createdAt: "desc",
+      updatedAt: "desc",
     },
   });
 

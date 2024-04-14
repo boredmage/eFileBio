@@ -80,6 +80,7 @@ export const saveForm = async (
         id: formId,
       },
       data: {
+        updatedAt: new Date(),
         fi: {
           upsert: {
             create: { ...fi },
