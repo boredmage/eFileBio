@@ -105,6 +105,14 @@ const businessEntityTypes = [
   { label: "Other", value: "other" },
 ];
 
+const chipColor = {
+  DRAFT: "warning",
+  INREVIEW: "secondary",
+  SUBMITTED: "primary",
+  APPROVED: "success",
+  REJECTED: "danger",
+} as const;
+
 export {
   // usStates,
   foreignStates,
@@ -116,4 +124,5 @@ export {
   businessEntityTypes,
   taxIdentificationTypes,
   identifyingDocumentTypes,
+  chipColor,
 };

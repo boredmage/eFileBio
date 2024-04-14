@@ -14,14 +14,7 @@ import {
 import { Clock, EllipsisVertical } from "lucide-react";
 import { getDueDate } from "@/lib/utils";
 import { FillingStatus, FilingType } from "@prisma/client";
-
-const chipColor = {
-  DRAFT: "warning",
-  INREVIEW: "secondary",
-  SUBMITTED: "primary",
-  APPROVED: "success",
-  REJECTED: "danger",
-} as const;
+import { chipColor } from "@/utils/constants";
 
 const FormCard = ({
   formId,

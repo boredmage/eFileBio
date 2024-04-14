@@ -3,7 +3,13 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@nextui-org/react";
-import { Category, Setting, LogoutCurve, User } from "iconsax-react";
+import {
+  Category,
+  Setting,
+  LogoutCurve,
+  User,
+  TableDocument,
+} from "iconsax-react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 
@@ -23,30 +29,30 @@ const Sidebar = () => {
           />
         </div>
         <ul>
-          <li>
-            <Navlink
-              title="Dashboard"
-              href="/dashboard"
-              icon={Category}
-              active={pathname.startsWith("/dashboard")}
-            />
-          </li>
-          <li>
-            <Navlink
-              title="Settings"
-              href="/settings"
-              icon={Setting}
-              active={pathname === "/settings"}
-            />
-          </li>
-          <li>
-            <Navlink
-              title="Profile"
-              href="/profile"
-              icon={User}
-              active={pathname === "/profile"}
-            />
-          </li>
+          <Navlink
+            title="Dashboard"
+            href="/dashboard"
+            icon={Category}
+            active={pathname.startsWith("/dashboard")}
+          />
+          <Navlink
+            title="Forms"
+            href="/forms"
+            icon={TableDocument}
+            active={pathname.startsWith("/forms")}
+          />
+          <Navlink
+            title="Settings"
+            href="/settings"
+            icon={Setting}
+            active={pathname === "/settings"}
+          />
+          <Navlink
+            title="Profile"
+            href="/profile"
+            icon={User}
+            active={pathname === "/profile"}
+          />
         </ul>
       </div>
       <Button
@@ -74,20 +80,22 @@ function Navlink({
   icon: typeof LogoutCurve;
 }) {
   return (
-    <Link
-      href={href}
-      className={[
-        "m-auto mt-4 flex w-full items-center gap-2 rounded-xl p-3 transition-all duration-200 ease-in-out",
-        active ? "bg-[#464647]" : "border-transparent hover:bg-[#46464740]",
-      ].join(" ")}
-    >
-      <IconComponent
-        size={24}
-        color="#FFFFFF"
-        variant={active ? "Bulk" : "Outline"}
-      />
-      <span className="text-white">{title}</span>
-    </Link>
+    <li>
+      <Link
+        href={href}
+        className={[
+          "m-auto mt-4 flex w-full items-center gap-2 rounded-xl p-3 transition-all duration-200 ease-in-out",
+          active ? "bg-[#464647]" : "border-transparent hover:bg-[#46464740]",
+        ].join(" ")}
+      >
+        <IconComponent
+          size={24}
+          color="#FFFFFF"
+          variant={active ? "Bulk" : "Outline"}
+        />
+        <span className="text-white">{title}</span>
+      </Link>
+    </li>
   );
 }
 
