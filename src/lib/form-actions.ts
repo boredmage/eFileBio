@@ -226,6 +226,8 @@ export const saveForm = async (
     });
 
     if (formStep === 0 && fi.filingType === "INITIAL") {
+      revalidatePath(`/forms`);
+      revalidatePath(`/forms/${formId}`);
       revalidatePath(`/dashboard/${businessId}`);
     }
     return updatedForm;
