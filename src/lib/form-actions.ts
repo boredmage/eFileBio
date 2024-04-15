@@ -62,6 +62,14 @@ export const saveForm = async (
 
     [ca, bo].forEach((forms) => {
       forms.forEach((form) => {
+        if (!form.identification?.id) {
+          // @ts-expect-error
+          delete form.identification.id;
+        }
+        if (!form.identifyingDocument?.id) {
+          // @ts-expect-error
+          delete form.identifyingDocument.id;
+        }
         // @ts-expect-error
         delete form.formId;
         // @ts-expect-error
@@ -100,32 +108,30 @@ export const saveForm = async (
                 ? await Promise.all(
                     ca.map(async (entry) => {
                       const { identification, identifyingDocument } = entry;
+                      const identificationData = {
+                        data: { ...identification },
+                      };
+                      const identifyingDocumentData = {
+                        data: { ...identifyingDocument },
+                      };
 
-                      const createdIdentification =
-                        await prisma.identification.upsert({
-                          where: {
-                            id: identification.id,
-                          },
-                          update: {
-                            ...identification,
-                          },
-                          create: {
-                            ...identification,
-                          },
-                        });
+                      const createdIdentification = identification.id
+                        ? await prisma.identification.update({
+                            where: { id: identification.id },
+                            ...identificationData,
+                          })
+                        : await prisma.identification.create(
+                            identificationData,
+                          );
 
-                      const createdIdentifyingDocument =
-                        await prisma.identifyingDocument.upsert({
-                          where: {
-                            id: identifyingDocument.id,
-                          },
-                          update: {
-                            ...identifyingDocument,
-                          },
-                          create: {
-                            ...identifyingDocument,
-                          },
-                        });
+                      const createdIdentifyingDocument = identifyingDocument.id
+                        ? await prisma.identifyingDocument.update({
+                            where: { id: identifyingDocument.id },
+                            ...identifyingDocumentData,
+                          })
+                        : await prisma.identifyingDocument.create(
+                            identifyingDocumentData,
+                          );
 
                       if (entry.hasOwnProperty("identification")) {
                         // @ts-expect-error
@@ -220,8 +226,18 @@ export const saveForm = async (
       include: {
         fi: true,
         rc: true,
-        ca: true,
-        bo: true,
+        ca: {
+          include: {
+            identification: true,
+            identifyingDocument: true,
+          },
+        },
+        bo: {
+          include: {
+            identification: true,
+            identifyingDocument: true,
+          },
+        },
       },
     });
 
@@ -230,6 +246,7 @@ export const saveForm = async (
       revalidatePath(`/forms/${formId}`);
       revalidatePath(`/dashboard/${businessId}`);
     }
+
     return updatedForm;
   } catch (error) {
     console.error(error);

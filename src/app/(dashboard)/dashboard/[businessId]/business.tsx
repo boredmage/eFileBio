@@ -40,6 +40,9 @@ async function getBusiness(businessId: string, userId: string) {
             },
           },
         },
+        orderBy: {
+          version: "desc",
+        },
       },
       description: true,
       creationDate: true,

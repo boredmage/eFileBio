@@ -21,7 +21,7 @@ import {
 import { ArrowLeft, MoveRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { boFormInterface } from "@/types/form-types";
-import { Business } from "@prisma/client";
+import { Business, Form as iForm } from "@prisma/client";
 import PreviewModal from "../../components/preview-modal";
 import { saveForm } from "@/lib/form-actions";
 
@@ -64,8 +64,7 @@ const Form = ({
     },
   });
 
-  useEffect(() => {
-    // console.log(JSON.stringify(form, null, 2));
+  const updateFormData = (formEntries: iFullFormType) => {
     if (businessId && formId) {
       const savedData = localStorage.getItem(
         (businessId as string).concat(formId as string),
@@ -73,8 +72,8 @@ const Form = ({
 
       if (!savedData) {
         formData.setValues({
-          fi: form.fi ?? fiFormShape,
-          rc: form.rc ?? rcFormShape,
+          fi: formEntries.fi ?? fiFormShape,
+          rc: formEntries.rc ?? rcFormShape,
           ca: [caFormShape],
           bo: [boFormShape],
         });
@@ -88,10 +87,10 @@ const Form = ({
 
       if (form) {
         formData.setValues({
-          fi: form.fi ?? fiEntry,
-          rc: form.rc ?? rcEntry,
-          ca: form.ca.length ? form.ca : caEntry,
-          bo: form.bo.length ? form.bo : boEntry,
+          fi: formEntries.fi ?? fiEntry,
+          rc: formEntries.rc ?? rcEntry,
+          ca: formEntries.ca.length ? formEntries.ca : caEntry,
+          bo: formEntries.bo.length ? formEntries.bo : boEntry,
         });
       } else if (savedData) {
         formData.setValues({
@@ -109,6 +108,11 @@ const Form = ({
         });
       }
     }
+  };
+
+  useEffect(() => {
+    // console.log(JSON.stringify(form, null, 2));
+    updateFormData(form);
   }, []);
 
   useEffect(() => {
@@ -122,6 +126,23 @@ const Form = ({
 
     return () => clearTimeout(timer);
   }, [formData.values]);
+
+  async function saveFormData() {
+    let updatedForm = (await saveForm(
+      businessId,
+      formId,
+      activeTab,
+      formData.values,
+    )) as iForm;
+
+    // Update the form with the new data
+    if (updatedForm) {
+      updateFormData({
+        ...form,
+        ...updatedForm,
+      });
+    }
+  }
 
   const handleNext = async () => {
     try {
@@ -141,7 +162,7 @@ const Form = ({
         !formData.errors.fi &&
         !formData.errors.rc
       ) {
-        await saveForm(businessId, formId, activeTab, formData.values);
+        await saveFormData();
         fileOpenHandler();
       } else {
         formData.handleSubmit();
@@ -151,17 +172,17 @@ const Form = ({
         setActiveTab((currentIndex) => currentIndex + 1);
         formData.setErrors({});
         formData.setTouched({});
-        await saveForm(businessId, formId, activeTab, formData.values);
+        await saveFormData();
       } else if (activeTab === 1 && !formData.errors.rc) {
         setActiveTab((currentIndex) => currentIndex + 1);
         formData.setErrors({});
         formData.setTouched({});
-        await saveForm(businessId, formId, activeTab, formData.values);
+        await saveFormData();
       } else if (activeTab === 2 && !formData.errors.ca) {
         setActiveTab((currentIndex) => currentIndex + 1);
         formData.setErrors({});
         formData.setTouched({});
-        await saveForm(businessId, formId, activeTab, formData.values);
+        await saveFormData();
       }
     } catch (error) {
       console.log(error);
