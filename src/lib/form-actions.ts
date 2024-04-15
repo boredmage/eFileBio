@@ -61,10 +61,9 @@ export const saveForm = async (
     });
 
     [ca, bo].forEach((forms) => {
-      // @ts-expect-error
-      delete forms.formId;
-
       forms.forEach((form) => {
+        // @ts-expect-error
+        delete form.formId;
         // @ts-expect-error
         delete form.id;
         // @ts-expect-error

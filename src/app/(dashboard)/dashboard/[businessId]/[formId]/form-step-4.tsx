@@ -1,3 +1,5 @@
+"use client";
+
 import FormDate from "@/components/form-date";
 import FormInput from "@/components/form-input";
 import FormSelect from "@/components/form-select";

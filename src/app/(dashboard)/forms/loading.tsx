@@ -5,15 +5,15 @@ const Loading = () => {
   return (
     <div className="space-y-2">
       {Array.from({ length: 9 }, (_, i) => (
-        <Loader key={i} />
+        <FormListLoader key={i} />
       ))}
     </div>
   );
 };
 
-const Loader = () => (
+export const FormListLoader = () => (
   <div className="space-y-2">
-    <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FFFFFF] p-3 p-3 hover:border-[#EDEDED]">
+    <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FFFFFF] p-3 hover:border-[#EDEDED]">
       <div className="flex w-fit gap-4">
         <Skeleton className="h-12 w-12 rounded-md" />
         <div>

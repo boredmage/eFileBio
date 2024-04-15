@@ -4,7 +4,7 @@ import { Avatar, Button, Progress, useDisclosure } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import FormTab from "../../components/form-tab";
 import FormSteps from "./form-steps";
-import { FormikProps, useFormik } from "formik";
+import { useFormik } from "formik";
 import {
   fiFormInterface,
   rcFormInterface,
@@ -21,7 +21,7 @@ import {
 import { ArrowLeft, MoveRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { boFormInterface } from "@/types/form-types";
-import { Business, FiForm, Form as FormType } from "@prisma/client";
+import { Business } from "@prisma/client";
 import PreviewModal from "../../components/preview-modal";
 import { saveForm } from "@/lib/form-actions";
 
@@ -208,26 +208,26 @@ const Form = ({
         <div className="flex-grow">
           {activeTab === 0 && (
             <FormSteps.FormStep1
-              formData={formData as FormikProps<iFormType>}
+              formData={formData}
               datePrepared={form.createdAt}
               isPreview={isFormReadOnly}
             />
           )}
           {activeTab === 1 && (
             <FormSteps.FormStep2
-              formData={formData as FormikProps<iFormType>}
+              formData={formData}
               isPreview={isFormReadOnly}
             />
           )}
           {activeTab === 2 && (
             <FormSteps.FormStep3
-              formData={formData as FormikProps<iFormType>}
+              formData={formData}
               isPreview={isFormReadOnly}
             />
           )}
           {activeTab === 3 && (
             <FormSteps.FormStep4
-              formData={formData as FormikProps<iFormType>}
+              formData={formData}
               isPreview={isFormReadOnly}
             />
           )}
@@ -258,22 +258,13 @@ const Form = ({
             formContent={
               <>
                 <FormSteps.FormStep1
-                  formData={formData as FormikProps<iFormType>}
+                  formData={formData}
                   datePrepared={form.createdAt}
                   isPreview
                 />
-                <FormSteps.FormStep2
-                  formData={formData as FormikProps<iFormType>}
-                  isPreview
-                />
-                <FormSteps.FormStep3
-                  formData={formData as FormikProps<iFormType>}
-                  isPreview
-                />
-                <FormSteps.FormStep4
-                  formData={formData as FormikProps<iFormType>}
-                  isPreview
-                />
+                <FormSteps.FormStep2 formData={formData} isPreview />
+                <FormSteps.FormStep3 formData={formData} isPreview />
+                <FormSteps.FormStep4 formData={formData} isPreview />
               </>
             }
           />
