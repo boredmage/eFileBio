@@ -37,7 +37,18 @@ const FormSelect = ({
         onSelectionChange={(val) => {
           setFieldValue && props.name && setFieldValue(props.name, val);
         }}
+        showScrollIndicators={true}
+        scrollShadowProps={{
+          isEnabled: false,
+        }}
         {...props}
+        classNames={
+          {
+            // listboxWrapper: "custom-scroll",
+            // popoverContent:
+            //   "border border-red-500 !custom-scroll overflow-y-hidden h-24",
+          }
+        }
       >
         {listContent.map((list, i) => (
           <AutocompleteItem

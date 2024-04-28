@@ -281,11 +281,10 @@ const Form = ({
                 <FormSteps.FormStep1
                   formData={formData}
                   datePrepared={form.createdAt}
-                  isPreview
                 />
-                <FormSteps.FormStep2 formData={formData} isPreview />
-                <FormSteps.FormStep3 formData={formData} isPreview />
-                <FormSteps.FormStep4 formData={formData} isPreview />
+                <FormSteps.FormStep2 formData={formData} />
+                <FormSteps.FormStep3 formData={formData} />
+                <FormSteps.FormStep4 formData={formData} />
               </>
             }
           />

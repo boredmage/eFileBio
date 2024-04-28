@@ -35,6 +35,11 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id            String     @id @default(cuid())
   name          String?
@@ -45,6 +50,7 @@ model User {
   sessions      Session[]
   Business      Business[]
   Form          Form[]
+  role          Role       @default(USER)
 }
 
 model VerificationToken {
@@ -128,8 +134,8 @@ model RcForm {
   taxId                            String
   taxJurisdiction                  String
   jurisdiction                     String
-  domesticState                    String
-  domesticTribalJurisdiction       String
+  domesticState                    String?
+  domesticTribalJurisdiction       String?
   domesticOtherTribe               String
   foreignFirstState                String
   foreignTribalJurisdiction        String
