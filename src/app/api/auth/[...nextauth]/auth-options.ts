@@ -1,7 +1,8 @@
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/db";
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, Session } from "next-auth";
+import { JWT } from "next-auth/jwt";
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -13,5 +14,24 @@ export const authOptions: NextAuthOptions = {
   ],
   session: {
     strategy: "jwt",
+  },
+  callbacks: {
+    session: async (params: { session: Session; token: JWT }) => {
+      const { session } = params;
+
+      const dbUser = await prisma.user.findUnique({
+        where: { email: session.user?.email ?? undefined },
+        select: { role: true },
+      });
+
+      if (session && session.user && dbUser?.role) {
+        session.user = {
+          ...session.user,
+          role: dbUser?.role,
+        };
+      }
+
+      return Promise.resolve(session);
+    },
   },
 };

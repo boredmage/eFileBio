@@ -3,6 +3,8 @@ import Form from "./form";
 import Loading from "./loading";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 
 async function getFormData(formId: string) {
   const formData = await prisma.form.findUnique({
@@ -34,6 +36,11 @@ async function getFormData(formId: string) {
 const Page = async ({ params }: { params: { formId: string } }) => {
   const { formId } = params;
   const formData = await getFormData(formId);
+  const session = await getServerSession(authOptions);
+
+  if (session?.user.role !== "ADMIN") {
+    return redirect("/dashboard");
+  }
 
   if (!formData) {
     return redirect("/forms");

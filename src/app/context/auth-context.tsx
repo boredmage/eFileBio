@@ -1,5 +1,6 @@
 "use client";
 
+import { Role } from "@prisma/client";
 import { redirect } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { createContext, useContext } from "react";
@@ -8,6 +9,7 @@ interface AuthContextType {
   name: string;
   email: string;
   profileImage: string;
+  role: Role;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -30,6 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: session!.user!.name as string,
         email: session!.user!.email as string,
         profileImage: session!.user!.image as string,
+        role: session!.user!.role as Role,
       }}
     >
       {children}

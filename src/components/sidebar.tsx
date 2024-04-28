@@ -12,9 +12,11 @@ import {
 } from "iconsax-react";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
+import { useAuthContext } from "@/app/context/auth-context";
 
 const Sidebar = () => {
   const pathname = usePathname();
+  const authData = useAuthContext();
 
   return (
     <div className="flex h-screen w-64 flex-col justify-between border-r border-gray-300 bg-black p-6">
@@ -35,12 +37,14 @@ const Sidebar = () => {
             icon={Category}
             active={pathname.startsWith("/dashboard")}
           />
-          <Navlink
-            title="Forms"
-            href="/forms"
-            icon={TableDocument}
-            active={pathname.startsWith("/forms")}
-          />
+          {authData?.role === "ADMIN" && (
+            <Navlink
+              title="Forms"
+              href="/forms"
+              icon={TableDocument}
+              active={pathname.startsWith("/forms")}
+            />
+          )}
           <Navlink
             title="Settings"
             href="/settings"
