@@ -1,9 +1,6 @@
 import React from "react";
 import Link from "next/link";
 import AuthButton from "./auth-button";
-import { Button } from "@nextui-org/react";
-import { signOut } from "next-auth/react";
-import { Logout } from "iconsax-react";
 
 const Navbar = () => {
   return (
@@ -29,18 +26,7 @@ const Navbar = () => {
         })}
       </ul>
 
-      <div className="flex items-center justify-center gap-2">
-        <AuthButton type="mininal" />
-        <Button
-          radius="full"
-          onClick={() => signOut()}
-          isIconOnly
-          variant="ghost"
-          color="danger"
-        >
-          <Logout />
-        </Button>
-      </div>
+      <AuthButton type="mininal" />
     </div>
   );
 };
