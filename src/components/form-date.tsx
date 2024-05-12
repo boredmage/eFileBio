@@ -13,13 +13,18 @@ const FormDate = ({
 }) => {
   const { value } = props;
 
-  let [date, setDate] = useState(value ? parseAbsoluteToLocal(value) : null);
+  let [date, setDate] = useState(
+    value ? parseAbsoluteToLocal(new Date(value).toISOString()) : null,
+  );
 
   useEffect(() => {
     date &&
       setFieldValue &&
       props.name &&
-      setFieldValue(props.name, new Date(date.toString()).toISOString());
+      setFieldValue(
+        props.name,
+        new Date(date.toAbsoluteString()).toISOString(),
+      );
   }, [date]);
 
   return (

@@ -4,7 +4,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { getServerSession } from "next-auth";
 import { prisma } from "./db";
 import { iFormType } from "@/app/(dashboard)/dashboard/[businessId]/[formId]/form";
-import { AddressType } from "@prisma/client";
+import { AddressType, FillingStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export const saveForm = async (
@@ -80,6 +80,25 @@ export const saveForm = async (
         delete form.updatedAt;
       });
     });
+
+    if (formStep === 0 && fi.filingType === "INITIAL") {
+      // Archive all forms for this business where the filing type is INITIAL and id is not the current form
+      await prisma.form.updateMany({
+        where: {
+          businessId,
+          status: "DRAFT",
+          fi: {
+            filingType: "INITIAL",
+          },
+          id: {
+            not: formId,
+          },
+        },
+        data: {
+          status: "ARCHIVED",
+        },
+      });
+    }
 
     // Update the form accordingly
     const updatedForm = await prisma.form.update({
@@ -164,38 +183,40 @@ export const saveForm = async (
               formStep > 2
                 ? await Promise.all(
                     bo.map(async (entry) => {
-                      const { identification, identifyingDocument } = entry;
+                      const {
+                        identification,
+                        identifyingDocument,
+                        isExemptEntity,
+                      } = entry;
 
                       let createdIdentification, createdIdentifyingDocument;
+                      const identificationData = {
+                        data: { ...identification },
+                      };
+                      const identifyingDocumentData = {
+                        data: { ...identifyingDocument },
+                      };
 
-                      if (identification) {
-                        createdIdentification =
-                          await prisma.identification.upsert({
-                            where: {
-                              id: identification.id,
-                            },
-                            update: {
-                              ...identification,
-                            },
-                            create: {
-                              ...identification,
-                            },
-                          });
+                      if (!isExemptEntity && identification) {
+                        createdIdentification = identification.id
+                          ? await prisma.identification.update({
+                              where: { id: identification.id },
+                              ...identificationData,
+                            })
+                          : await prisma.identification.create({
+                              data: { ...identification },
+                            });
                       }
 
-                      if (identifyingDocument) {
-                        createdIdentifyingDocument =
-                          await prisma.identifyingDocument.upsert({
-                            where: {
-                              id: identifyingDocument.id,
-                            },
-                            update: {
-                              ...identifyingDocument,
-                            },
-                            create: {
-                              ...identifyingDocument,
-                            },
-                          });
+                      if (!isExemptEntity && identifyingDocument) {
+                        createdIdentifyingDocument = identifyingDocument.id
+                          ? await prisma.identifyingDocument.update({
+                              where: { id: identifyingDocument.id },
+                              ...identifyingDocumentData,
+                            })
+                          : await prisma.identifyingDocument.create({
+                              data: { ...identifyingDocument },
+                            });
                       }
 
                       if (entry.hasOwnProperty("identification")) {
@@ -211,11 +232,13 @@ export const saveForm = async (
                       return {
                         ...entry,
                         dob: new Date(entry.dob ? entry.dob : 0),
-                        identificationId:
-                          createdIdentification && createdIdentification.id,
-                        identifyingDocumentId:
-                          createdIdentifyingDocument &&
-                          createdIdentifyingDocument.id,
+                        ...(!isExemptEntity && {
+                          identificationId:
+                            createdIdentification && createdIdentification.id,
+                          identifyingDocumentId:
+                            createdIdentifyingDocument &&
+                            createdIdentifyingDocument.id,
+                        }),
                       };
                     }),
                   )
@@ -247,6 +270,60 @@ export const saveForm = async (
       revalidatePath(`/dashboard/${businessId}`);
     }
 
+    return updatedForm;
+  } catch (error) {
+    console.error(error);
+    return {
+      message: "Error",
+    };
+  }
+};
+
+export const serverUpdateFormStatus = async (
+  formId: string,
+  status: FillingStatus,
+) => {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user || !session.user.email) {
+      return {
+        message: "Unauthenticated",
+      };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return {
+        message: "Unauthorized",
+      };
+    }
+
+    const form = await prisma.form.findUnique({
+      where: {
+        id: formId,
+      },
+    });
+
+    if (!form) {
+      throw new Error("Form not found");
+    }
+
+    const updatedForm = await prisma.form.update({
+      where: {
+        id: formId,
+      },
+      data: {
+        status,
+      },
+    });
+
+    revalidatePath(`/forms/${formId}`);
+    revalidatePath(`/dashboard/${form.businessId}`);
+    revalidatePath(`/dashboard/${form.businessId}/${formId}`);
     return updatedForm;
   } catch (error) {
     console.error(error);

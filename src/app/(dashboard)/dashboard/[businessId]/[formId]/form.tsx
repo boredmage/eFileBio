@@ -1,7 +1,7 @@
 "use client";
 
 import { Avatar, Button, Progress, useDisclosure } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FormTab from "../../components/form-tab";
 import FormSteps from "./form-steps";
 import { useFormik } from "formik";
@@ -50,6 +50,7 @@ const Form = ({
     onOpenChange: modalOpenChangeHandler,
   } = useDisclosure();
   const isFormReadOnly = form.status !== "DRAFT";
+  const topContentRef = useRef(null);
 
   const formData = useFormik<iFormType>({
     initialValues: {
@@ -110,8 +111,17 @@ const Form = ({
     }
   };
 
+  const scrollToTop = () => {
+    topContentRef &&
+      topContentRef.current &&
+      (topContentRef.current as HTMLDivElement).scrollIntoView({
+        behavior: "smooth",
+      });
+  };
+
+  useEffect(() => scrollToTop(), [activeTab]);
+
   useEffect(() => {
-    // console.log(JSON.stringify(form, null, 2));
     updateFormData(form);
   }, []);
 
@@ -189,108 +199,116 @@ const Form = ({
       alert("An error occurred. Please try again.");
     }
   };
-  const handleBack = () => setActiveTab((currentIndex) => currentIndex - 1);
+  const handleBack = () => {
+    setActiveTab((currentIndex) => currentIndex - 1);
+    scrollToTop();
+  };
 
   return (
-    <div className="flex h-full flex-col">
-      <FormTab activeTab={activeTab} setActiveTab={setActiveTab} />
+    <>
+      <div ref={topContentRef} className="relative -top-5"></div>
+      <div className="flex h-full flex-col">
+        <FormTab activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div className="flex flex-1 flex-col rounded-b-2xl bg-white p-4">
-        <div className="space-y-4">
-          <Progress
-            color="warning"
-            aria-label="Loading..."
-            value={(activeTab + 1) * 25}
-          />
-          <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
-            <div className="flex w-fit gap-4">
-              <Avatar
-                src={business.logo ?? ""}
-                className="mx-auto !block h-12 w-12 !rounded-md !bg-transparent text-large"
-              />
-              <div>
-                <h2 className="text-xl font-semibold">New Business eFiling</h2>
-                <p className="text-sm">
-                  Create a New Business to manage eFiling
-                </p>
+        <div className="flex flex-1 flex-col rounded-b-2xl bg-white p-4">
+          <div className="space-y-4">
+            <Progress
+              color="warning"
+              aria-label="Loading..."
+              value={(activeTab + 1) * 25}
+            />
+            <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
+              <div className="flex w-fit gap-4">
+                <Avatar
+                  src={business.logo ?? ""}
+                  className="mx-auto !block h-12 w-12 !rounded-md !bg-transparent text-large"
+                />
+                <div>
+                  <h2 className="text-xl font-semibold">
+                    New Business eFiling
+                  </h2>
+                  <p className="text-sm">
+                    Create a New Business to manage eFiling
+                  </p>
+                </div>
               </div>
+              <Button
+                isIconOnly
+                aria-label="Like"
+                variant="flat"
+                className="h-12 w-12"
+                onClick={() => router.back()}
+              >
+                <ArrowLeft />
+              </Button>
             </div>
+          </div>
+          <div className="flex-grow">
+            {activeTab === 0 && (
+              <FormSteps.FormStep1
+                formData={formData}
+                datePrepared={form.createdAt}
+                isPreview={isFormReadOnly}
+              />
+            )}
+            {activeTab === 1 && (
+              <FormSteps.FormStep2
+                formData={formData}
+                isPreview={isFormReadOnly}
+              />
+            )}
+            {activeTab === 2 && (
+              <FormSteps.FormStep3
+                formData={formData}
+                isPreview={isFormReadOnly}
+              />
+            )}
+            {activeTab === 3 && (
+              <FormSteps.FormStep4
+                formData={formData}
+                isPreview={isFormReadOnly}
+              />
+            )}
+          </div>
+          <div className="mt-4 flex items-center justify-end gap-4">
             <Button
-              isIconOnly
-              aria-label="Like"
-              variant="flat"
-              className="h-12 w-12"
-              onClick={() => router.back()}
+              radius="full"
+              onClick={handleBack}
+              isDisabled={activeTab === 0}
             >
-              <ArrowLeft />
+              Back
             </Button>
+            <Button
+              radius="full"
+              color="warning"
+              endContent={<MoveRight />}
+              className="text-white"
+              onClick={handleNext}
+            >
+              Save and Continue
+            </Button>
+            <PreviewModal
+              formId={formId}
+              business={business}
+              isOpen={modalIsOpen}
+              formVersion={form.version}
+              onOpenChange={modalOpenChangeHandler}
+              formContent={
+                <>
+                  <FormSteps.FormStep1
+                    formData={formData}
+                    datePrepared={form.createdAt}
+                  />
+                  <FormSteps.FormStep2 formData={formData} />
+                  <FormSteps.FormStep3 formData={formData} />
+                  <FormSteps.FormStep4 formData={formData} />
+                </>
+              }
+            />
           </div>
         </div>
-        <div className="flex-grow">
-          {activeTab === 0 && (
-            <FormSteps.FormStep1
-              formData={formData}
-              datePrepared={form.createdAt}
-              isPreview={isFormReadOnly}
-            />
-          )}
-          {activeTab === 1 && (
-            <FormSteps.FormStep2
-              formData={formData}
-              isPreview={isFormReadOnly}
-            />
-          )}
-          {activeTab === 2 && (
-            <FormSteps.FormStep3
-              formData={formData}
-              isPreview={isFormReadOnly}
-            />
-          )}
-          {activeTab === 3 && (
-            <FormSteps.FormStep4
-              formData={formData}
-              isPreview={isFormReadOnly}
-            />
-          )}
-        </div>
-        <div className="mt-4 flex items-center justify-end gap-4">
-          <Button
-            radius="full"
-            onClick={handleBack}
-            isDisabled={activeTab === 0}
-          >
-            Back
-          </Button>
-          <Button
-            radius="full"
-            color="warning"
-            endContent={<MoveRight />}
-            className="text-white"
-            onClick={handleNext}
-          >
-            Save and Continue
-          </Button>
-          <PreviewModal
-            formId={formId}
-            business={business}
-            isOpen={modalIsOpen}
-            formVersion={form.version}
-            onOpenChange={modalOpenChangeHandler}
-            formContent={
-              <>
-                <FormSteps.FormStep1
-                  formData={formData}
-                  datePrepared={form.createdAt}
-                />
-                <FormSteps.FormStep2 formData={formData} />
-                <FormSteps.FormStep3 formData={formData} />
-                <FormSteps.FormStep4 formData={formData} />
-              </>
-            }
-          />
-        </div>
       </div>
-    </div>
+    </>
   );
 };
 

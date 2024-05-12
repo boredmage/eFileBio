@@ -57,6 +57,7 @@ const formStep4Validation = Yup.array().of(
                 schema.required("Other tribe is a required field"),
               otherwise: (schema) => schema.notRequired(),
             }),
+            image: Yup.string().required("Identification document is required"),
           }),
       }),
     },

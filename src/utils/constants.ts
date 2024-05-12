@@ -111,6 +111,7 @@ const chipColor = {
   SUBMITTED: "primary",
   APPROVED: "success",
   REJECTED: "danger",
+  ARCHIVED: "default",
 } as const;
 
 export {
