@@ -12,7 +12,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex h-full flex-col gap-4">
       {!isFormPage && (
-        <div className="flex items-end justify-between">
+        <div className="flex flex-col items-end justify-between space-y-4 md:flex-row">
           <div>
             <h2 className="text-2xl font-semibold">Dashboard</h2>
             <p>
@@ -21,7 +21,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
             </p>
           </div>
           {Object.keys(params)[0] === "businessId" && (
-            <div>
+            <div className="w-full md:w-fit">
               <NewBoir businessId={params.businessId as string} />
             </div>
           )}

@@ -23,6 +23,7 @@ const NewBoir = ({ businessId }: { businessId: string }) => {
 
   return (
     <Button
+      className="w-full md:w-fit"
       startContent={isLoading ? null : <Add />}
       onPress={handleNewBoir}
       isLoading={isLoading}

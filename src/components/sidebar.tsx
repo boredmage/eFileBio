@@ -13,13 +13,25 @@ import {
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
 import { useAuthContext } from "@/app/context/auth-context";
+import { cn } from "@/lib/utils";
 
-const Sidebar = () => {
+const Sidebar = ({
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: (open: boolean) => void;
+}) => {
   const pathname = usePathname();
   const authData = useAuthContext();
 
   return (
-    <div className="flex h-screen w-64 flex-col justify-between border-r border-gray-300 bg-black p-6">
+    <div
+      className={cn(
+        "fixed -left-64 z-20 flex h-screen w-64 flex-col justify-between border-gray-300 bg-black p-6 transition-left md:relative md:left-0 md:border-r",
+        isSidebarOpen ? "left-0" : "-left-64",
+      )}
+    >
       <div>
         <div className="m-auto w-full pb-5">
           <Image
@@ -32,6 +44,7 @@ const Sidebar = () => {
         </div>
         <ul>
           <Navlink
+            onClick={() => setIsSidebarOpen(false)}
             title="Dashboard"
             href="/dashboard"
             icon={Category}
@@ -39,6 +52,7 @@ const Sidebar = () => {
           />
           {authData?.role === "ADMIN" && (
             <Navlink
+              onClick={() => setIsSidebarOpen(false)}
               title="Forms"
               href="/forms"
               icon={TableDocument}
@@ -46,12 +60,14 @@ const Sidebar = () => {
             />
           )}
           <Navlink
+            onClick={() => setIsSidebarOpen(false)}
             title="Settings"
             href="/settings"
             icon={Setting}
             active={pathname === "/settings"}
           />
           <Navlink
+            onClick={() => setIsSidebarOpen(false)}
             title="Profile"
             href="/profile"
             icon={User}
@@ -77,14 +93,16 @@ function Navlink({
   title,
   active,
   icon: IconComponent,
+  onClick,
 }: {
   href: string;
   title: string;
   active: boolean;
   icon: typeof LogoutCurve;
+  onClick: () => void;
 }) {
   return (
-    <li>
+    <li onClick={onClick}>
       <Link
         href={href}
         className={[
