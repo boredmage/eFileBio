@@ -36,7 +36,7 @@ export default function PreviewModal({
         scrollBehavior="inside"
         // backdrop="blur"
       >
-        <ModalContent className="min-h-screen">
+        <ModalContent className="min-h-dvh">
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col p-2">

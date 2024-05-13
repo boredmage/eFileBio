@@ -188,7 +188,7 @@ const SectionForm = ({
         title={
           <div
             className={clsx(
-              "flex items-center justify-between pb-0",
+              "flex flex-col items-start justify-between gap-2 pb-0 lg:flex-row lg:items-center lg:gap-0",
               level === 0 && "pt-4",
             )}
           >
@@ -283,7 +283,7 @@ const SectionForm = ({
         {!boValue.isExemptEntity && <Divider className="bg-[#F5F5F5]" />}
         <div className="space-y-6 py-6">
           <h2 className="font-semibold">Full legal name and date of birth:</h2>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid gap-6 lg:grid-cols-3">
             {!boValue.isExemptEntity && (
               <>
                 <FormInput
@@ -311,7 +311,7 @@ const SectionForm = ({
             />
           </div>
           {!boValue.isExemptEntity && (
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid gap-6 sm:grid-cols-2">
               <FormInput
                 label="Suffix"
                 {...getFieldProps(`bo.${level}.suffix`)}
@@ -335,7 +335,7 @@ const SectionForm = ({
             <Divider className="bg-[#F5F5F5]" />
             <div className="space-y-6 py-6">
               <h2 className="font-semibold">Residential address:</h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-6 lg:grid-cols-2">
                 <FormSelect
                   listContent={sortedCountries}
                   label="Country/Jurisdiction"
@@ -357,7 +357,7 @@ const SectionForm = ({
                   errorMessage={boTouched?.address && boError?.address}
                 />
               </div>
-              <div className="grid grid-cols-3 gap-6">
+              <div className="grid gap-6 lg:grid-cols-3">
                 <FormInput
                   label="City"
                   isRequired
@@ -394,7 +394,7 @@ const SectionForm = ({
               <h2 className="font-semibold">
                 Form of identification and issuing jurisdiction:
               </h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-6 lg:grid-cols-2">
                 <FormSelect
                   listContent={identifyingDocumentTypes}
                   label="Identifying document type"
@@ -453,7 +453,7 @@ const SectionForm = ({
                 Identifying document issuing jurisdiction{" "}
                 <span className="text-red-500">*</span>
               </h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-6 lg:grid-cols-2">
                 <FormSelect
                   listContent={getCountryForJurisdiction()}
                   label="Country/Jurisdiction"
@@ -520,7 +520,7 @@ const SectionForm = ({
                   }
                 />
               </div>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-6 lg:grid-cols-2">
                 <FormSelect
                   listContent={tribalJurisdiction}
                   label="Local/Tribal"
@@ -562,7 +562,7 @@ const SectionForm = ({
             <Divider className="bg-[#F5F5F5]" />
             <div className="space-y-6 py-6">
               {!isPreview && (
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col items-start justify-between gap-2 md:flex-row md:items-center md:gap-0">
                   <div>
                     <h2 className="font-semibold">
                       Identifying document{" "}
@@ -577,7 +577,7 @@ const SectionForm = ({
                   </div>
                   <UploadButton
                     endpoint="fileUploader"
-                    className="outline-none ut-button:w-auto ut-button:rounded-full ut-button:border-2 ut-button:border-warning-500 ut-button:bg-white ut-button:px-4 ut-button:text-sm ut-button:text-black ut-button:outline-none ut-button:after:bg-warning-500 ut-allowed-content:hidden"
+                    className="w-full outline-none ut-button:w-full ut-button:rounded-full ut-button:border-2 ut-button:border-warning-500 ut-button:bg-white ut-button:px-4 ut-button:text-sm ut-button:text-black ut-button:outline-none ut-button:after:bg-warning-500 ut-allowed-content:hidden md:w-auto md:ut-button:w-auto"
                     onBeforeUploadBegin={(files) => {
                       console.log(files);
                       setIsUploadingDoc(true);

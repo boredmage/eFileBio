@@ -14,13 +14,13 @@ export default function DashboardLayout({
 
   return (
     <AuthProvider>
-      <section className="flex h-screen w-screen">
+      <section className="flex h-dvh w-screen">
         <Sidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
         <div
-          className={`fixed inset-0 z-10 bg-black bg-opacity-50 md:hidden ${
+          className={`fixed inset-0 z-40 bg-black bg-opacity-50 md:hidden ${
             isSidebarOpen ? "block" : "hidden"
           }`}
           onClick={() => setIsSidebarOpen(false)}

@@ -28,7 +28,7 @@ const Sidebar = ({
   return (
     <div
       className={cn(
-        "fixed -left-64 z-20 flex h-screen w-64 flex-col justify-between border-gray-300 bg-black p-6 transition-left md:relative md:left-0 md:border-r",
+        "fixed -left-64 z-50 flex h-dvh w-64 flex-col justify-between border-gray-300 bg-black p-6 transition-left md:relative md:left-0 md:border-r",
         isSidebarOpen ? "left-0" : "-left-64",
       )}
     >
