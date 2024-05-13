@@ -88,9 +88,9 @@ const FormStep2 = ({
 
   return (
     <form onSubmit={formData.handleSubmit}>
-      <div className="flex items-center justify-between py-6">
+      <div className="flex flex-col items-start justify-between gap-4 py-6 xl:flex-row xl:items-center xl:gap-0">
         <h2 className="font-semibold">Part I. Reporting Company Information</h2>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col items-start gap-6 xl:flex-row xl:items-center">
           <Checkbox
             color="warning"
             isSelected={rcValue.isRequestingId}
@@ -118,7 +118,7 @@ const FormStep2 = ({
       <Divider className="bg-[#F5F5F5]" />
       <div className="space-y-6 py-6">
         <h2 className="font-semibold">Full legal name and alternate name(s)</h2>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid gap-6 lg:grid-cols-2">
           <FormInput
             label="Reporting Company legal name"
             isRequired
@@ -148,6 +148,7 @@ const FormStep2 = ({
                       aria-label="Like"
                       size="lg"
                       variant="flat"
+                      radius="sm"
                       className="text-black"
                       onClick={() =>
                         setRcAlternateNameCount((prev) => {
@@ -180,7 +181,7 @@ const FormStep2 = ({
       <Divider className="bg-[#F5F5F5]" />
       <div className="space-y-6 py-6">
         <h2 className="font-semibold">Form of identification:</h2>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
           <FormSelect
             listContent={taxIdentificationTypes}
             label="Tax Identification type"
@@ -199,6 +200,7 @@ const FormStep2 = ({
             isInvalid={rcTouched?.taxType && !!rcError?.taxType}
             errorMessage={rcTouched?.taxType && rcError?.taxType}
             isRequired
+            className="col-span-full md:col-span-1"
           />
           <TaxIdFormInput
             name="rc.taxId"
@@ -211,6 +213,7 @@ const FormStep2 = ({
             isInvalid={rcTouched?.taxId && !!rcError?.taxId}
             errorMessage={rcTouched?.taxId && rcError?.taxId}
             isRequired
+            className="col-span-full md:col-span-1"
           />
           <FormSelect
             listContent={foreignCountries}
@@ -227,6 +230,7 @@ const FormStep2 = ({
             }
             isDisabled={rcValue.taxType !== "foreign"}
             isRequired={rcValue.taxType === "foreign"}
+            className="col-span-full md:col-span-2 xl:col-span-1"
           />
         </div>
       </div>
@@ -387,7 +391,7 @@ const FormStep2 = ({
       <Divider className="bg-[#F5F5F5]" />
       <div className="space-y-6 py-6">
         <h2 className="font-semibold">Current U.S. Address:</h2>
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid gap-6 lg:grid-cols-2">
           <FormSelect
             listContent={priorityCountries}
             label="U.S. or U.S. Territory"
@@ -423,7 +427,7 @@ const FormStep2 = ({
             errorMessage={rcTouched?.address && rcError?.address}
           />
         </div>
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid gap-6 md:grid-cols-3">
           <FormInput
             label="City"
             {...getFieldProps("rc.city")}

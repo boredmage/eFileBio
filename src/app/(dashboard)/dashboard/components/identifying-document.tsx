@@ -17,7 +17,7 @@ const IdentifyingDocument = ({
   isReadOnly?: boolean;
 }) => {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3">
+    <div className="flex flex-col items-center justify-between rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] p-3 md:flex-row">
       <div className="flex w-fit gap-4">
         <Avatar
           src={

@@ -65,7 +65,7 @@ const FormStep1 = ({
             </p>
           </div>
           <Divider className="bg-[#F5F5F5]" />
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center lg:gap-0">
             <h2 className="font-semibold">
               Type of filing:
               <span className="text-red-500">*</span>
@@ -98,7 +98,7 @@ const FormStep1 = ({
               errorMessage={fiTouched?.filingType && fiError?.filingType}
             />
           </div>
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid gap-6 md:grid-cols-3">
             <FormInput
               name="datePrepared"
               label="Date prepared (auto filled)"
@@ -122,7 +122,7 @@ const FormStep1 = ({
                 Reporting Company information associated with most recent
                 report, if any:
               </h2>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid gap-6 lg:grid-cols-2">
                 <FormInput
                   label="Legal Name"
                   isRequired

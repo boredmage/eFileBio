@@ -23,7 +23,7 @@ const RadioCheckbox = ({
       orientation="horizontal"
       color="warning"
       classNames={{
-        wrapper: "gap-8",
+        wrapper: "gap-8  gap-y-4",
       }}
       name={name}
       value={[selectedValue]}
