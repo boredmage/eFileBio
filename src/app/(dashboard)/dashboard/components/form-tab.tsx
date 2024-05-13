@@ -1,12 +1,13 @@
 "use client";
 
 import clsx from "clsx";
+import { BookUser, ClipboardMinus, Home, Users } from "lucide-react";
 
 const tabs = [
-  "Home",
-  "Reporting Company",
-  "Company Applicant(s)",
-  "Beneficial Owner",
+  [<Home key="home" />, "Home"],
+  [<ClipboardMinus key="reporting-company" />, "Reporting Company"],
+  [<Users key="company-applicant" />, "Company Applicant(s)"],
+  [<BookUser key="beneficial-owner" />, "Beneficial Owner"],
 ];
 
 const FormTab = ({
@@ -17,7 +18,7 @@ const FormTab = ({
   setActiveTab?: (index: number) => void;
 }) => {
   return (
-    <ul className="w-fit rounded-2xl bg-[#E5E5E5] before:table after:clear-both after:table after:overflow-hidden">
+    <ul className="flex w-fit rounded-2xl bg-[#E5E5E5] before:table after:clear-both after:table after:overflow-hidden">
       {tabs.map((tab, index) => (
         <li
           key={index}
@@ -33,7 +34,7 @@ const FormTab = ({
         >
           <span
             className={clsx(
-              "float-left rounded-t-2xl px-9 py-3 before:absolute before:-left-5 before:bottom-0 before:h-5 before:w-5 before:rounded-full before:bg-[#E5E5E5] after:absolute after:-right-5 after:bottom-0 after:h-5 after:w-5  after:rounded-full after:bg-[#E5E5E5]",
+              "float-left flex gap-2 rounded-t-2xl px-5 py-3 before:absolute before:-left-5 before:bottom-0 before:h-5 before:w-5 before:rounded-full before:bg-[#E5E5E5] after:absolute after:-right-5 after:bottom-0 after:h-5  after:w-5 after:rounded-full after:bg-[#E5E5E5] md:px-9",
               activeTab === index
                 ? "bg-[#fff] before:z-10 after:z-10"
                 : "bg-[#E5E5E5] before:z-20 after:z-20",
@@ -41,7 +42,10 @@ const FormTab = ({
               index === tabs.length - 1 && "after:bg-transparent",
             )}
           >
-            {tab}
+            <span className="inline-block xl:hidden">
+              {tab[0] as JSX.Element}
+            </span>
+            <span className="hidden xl:inline-block"> {tab[1]}</span>
           </span>
         </li>
       ))}
