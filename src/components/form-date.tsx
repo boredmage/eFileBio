@@ -38,7 +38,9 @@ const FormDate = ({
         input: "text-sm",
       }}
       value={date}
-      onChange={setDate}
+      onChange={(date) => {
+        setDate(parseAbsoluteToLocal(new Date(date.toDate()).toISOString()));
+      }}
     />
   );
 };
