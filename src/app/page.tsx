@@ -37,30 +37,36 @@ export default function Home() {
             className="mx-auto"
           />
 
-          <h2 className="mx-auto max-w-2xl text-balance text-center text-5xl font-bold">
+          <h2 className="mx-auto max-w-2xl text-balance text-center text-3xl font-bold md:text-5xl">
             Streamline Your Compliance Journey With eFileBOI
           </h2>
           <AuthButton type="large" />
 
-          <div className="mx-auto !mt-28 grid w-[98%] max-w-7xl grid-cols-5 gap-5">
+          <div className="mx-auto !mt-28 grid w-[95%] max-w-7xl gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             <HeroCard
               icon={<Icons.Identity />}
               title="Simple BOIR filing"
-              className="rounded-l-lg"
+              className="rounded-lg lg:rounded-r-none"
             />
             <HeroCard
               icon={<Icons.Calendar />}
               title="Stay Ahead of Deadlines"
+              className="rounded-lg lg:rounded-none"
             />
             <HeroCard
               icon={<Icons.Passlock />}
               title="Remain Secure and Compliant"
+              className="rounded-lg lg:rounded-none"
             />
-            <HeroCard icon={<Icons.Satisfaction />} title="24/7 Accesiblity" />
+            <HeroCard
+              icon={<Icons.Satisfaction />}
+              title="24/7 Accesiblity"
+              className="rounded-lg lg:rounded-none"
+            />
             <HeroCard
               icon={<Icons.Support />}
               title="Expert Support"
-              className="rounded-r-lg"
+              className="rounded-lg lg:rounded-l-none"
             />
           </div>
         </div>
@@ -70,11 +76,11 @@ export default function Home() {
           <Icons.Star />
           <h2>Features</h2>
         </div>
-        <h2 className="mx-auto max-w-4xl text-balance text-center text-4xl font-bold">
+        <h2 className="mx-auto max-w-4xl text-balance text-center text-2xl font-bold md:text-4xl">
           Empower your business with our state-of-the-art Electronic Filing
           Solution
         </h2>
-        <div className="mx-auto grid w-[98%] max-w-7xl grid-cols-3 gap-5">
+        <div className="mx-auto grid w-[95%] max-w-7xl gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <FeatureCard
             icon={<ClipboardText size="24" color="#FBBF24" variant="Outline" />}
           />
@@ -112,7 +118,7 @@ const HeroCard = ({
   return (
     <div
       className={clsx(
-        "flex flex-col items-center justify-around space-y-3 bg-white p-4 text-center",
+        "mx-auto flex h-40 w-full flex-col items-center justify-around space-y-3 bg-white p-4 text-center",
         className,
       )}
       style={{
@@ -135,7 +141,7 @@ const FeatureCard = ({
   description?: string;
 }) => {
   return (
-    <div className="space-y-4 rounded-2xl bg-[#FAFAFA] p-4">
+    <div className="mx-auto w-full space-y-4 rounded-2xl bg-[#FAFAFA] p-4">
       <div
         className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-4"
         style={{

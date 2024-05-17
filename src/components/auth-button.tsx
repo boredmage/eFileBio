@@ -1,10 +1,10 @@
 "use client";
 
 import Icons from "./icons";
-import clsx from "clsx";
 import { Button } from "@nextui-org/react";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 const AuthButton = ({ type }: { type: "mininal" | "large" }) => {
   const { push } = useRouter();
@@ -26,7 +26,11 @@ const AuthButton = ({ type }: { type: "mininal" | "large" }) => {
       variant="bordered"
       color="warning"
       size={type === "mininal" ? "md" : "lg"}
-      className={clsx("text-black", type === "large" ? "mx-auto min-w-52" : "")}
+      className={cn(
+        "text-black",
+        type === "large" && "mx-auto min-w-52",
+        type === "mininal" && "border-0 md:border-2 md:border-warning",
+      )}
       onClick={handleSignIn}
       isLoading={status === "loading"}
       isDisabled={status === "loading"}
