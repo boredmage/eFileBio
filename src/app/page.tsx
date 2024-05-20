@@ -16,17 +16,12 @@ import {
 } from "iconsax-react";
 import Footer from "../components/footer";
 import AuthButton from "../components/auth-button";
+import { Button } from "@nextui-org/react";
 
 export default function Home() {
   return (
     <Fragment>
-      <div
-        className="py-4 pb-14"
-        style={{
-          background: "url(/hero-bg.png), white",
-          boxShadow: "0px -16px 144px 0px rgba(0, 0, 0, 0.02) inset",
-        }}
-      >
+      <div className="relative bg-white bg-hero bg-cover bg-center bg-no-repeat py-4 pb-14 shadow-hero">
         <Navbar />
         <div className="space-y-10 pt-24 text-center">
           <Image
@@ -101,6 +96,38 @@ export default function Home() {
           />
         </div>
       </div>
+      <div className="overflow-hidden bg-[#FAFAFA]">
+        <div className="relative mx-auto grid w-[95%] max-w-7xl grid-cols-1 bg-[#FAFAFA] py-12 lg:grid-cols-4">
+          <div className="flex flex-col items-start justify-center">
+            <div className="flex flex-col items-center justify-center gap-3 text-center lg:w-[600px] lg:items-start lg:text-left">
+              <h2 className="text-balance text-2xl font-semibold">
+                Create a Business to manage eFiling{" "}
+              </h2>
+              <p className="text-balance">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                consequat vestibulum luctus. Curabitur vitae odio rhoncus
+              </p>
+              <p className="text-balance">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+                consequat vestibulum luctus. Curabitur vitae odio rhoncus
+              </p>
+              <Button
+                color="warning"
+                className="mx-auto w-full max-w-xs text-white lg:mx-0 lg:w-fit"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+          <div className="relative col-span-3 row-start-1 lg:col-start-2 lg:min-h-[650px]">
+            <img
+              src="/demo.png"
+              alt="dashboard_demo"
+              className="lg:absolute lg:-right-[29%] lg:top-1/2 lg:-translate-y-1/2"
+            />
+          </div>
+        </div>
+      </div>
       <Footer />
     </Fragment>
   );
@@ -118,12 +145,9 @@ const HeroCard = ({
   return (
     <div
       className={clsx(
-        "mx-auto flex h-40 w-full flex-col items-center justify-around space-y-3 bg-white p-4 text-center",
+        "mx-auto flex h-40 w-full flex-col items-center justify-around space-y-3 bg-white p-4 text-center shadow-heroCard",
         className,
       )}
-      style={{
-        boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
-      }}
     >
       {icon}
       <h3 className="text-base">{title}</h3>
@@ -142,12 +166,7 @@ const FeatureCard = ({
 }) => {
   return (
     <div className="mx-auto w-full space-y-4 rounded-2xl bg-[#FAFAFA] p-4">
-      <div
-        className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-4"
-        style={{
-          boxShadow: "rgba(0, 0, 0, 0.05) 0px 1px 4px",
-        }}
-      >
+      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white p-4 shadow-featureCard">
         {icon}
       </div>
       <div>

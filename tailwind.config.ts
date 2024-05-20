@@ -13,11 +13,12 @@ const config: Config = {
   theme: {
     extend: {
       backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+        hero: "url(/hero-bg.png)",
       },
       boxShadow: {
+        hero: "0px -16px 144px 0px rgba(0, 0, 0, 0.02) inset",
+        heroCard: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+        featureCard: "rgba(0, 0, 0, 0.05) 0px 1px 4px",
         nav: "rgba(0, 0, 0, 0.1) 0px 0px 5px 0px, rgba(0, 0, 0, 0.1) 0px 0px 1px 0px",
       },
     },
