@@ -45,7 +45,15 @@ const taxIdentificationTypes = [
   { label: "Foreign", value: "foreign" },
 ];
 
-const businessEntityTypes = [
+const businessEntityTypes: { label: string; value: string }[] = [
+  {
+    label: "Limited Liability Companies (LLC)",
+    value: "Limited Liability Companies (LLC)",
+  },
+  {
+    label: "Corporations",
+    value: "Corporations",
+  },
   {
     label: "Securities reporting issuer",
     value: "Securities reporting issuer",
