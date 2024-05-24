@@ -29,6 +29,8 @@ const FormDate = ({
 
   return (
     <DatePicker
+      isRequired={props.isRequired}
+      errorMessage={props.errorMessage}
       labelPlacement="outside"
       label={<span className="text-sm text-[#404040]">{label}</span>}
       granularity="day"
