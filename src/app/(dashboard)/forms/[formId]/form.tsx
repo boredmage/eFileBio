@@ -271,7 +271,7 @@ const Form = ({
           </div>
         </div>
       </div>
-      <div>
+      <div className="space-y-2">
         <FormSteps.FormStep1
           formData={formData}
           datePrepared={form.createdAt}

@@ -78,8 +78,7 @@ export default function PreviewModal({
                       formId,
                       "review-filling",
                     ).then((res) => {
-                      // @ts-ignore
-                      window.location.href = res.url;
+                      window.location.href = res.url ?? "";
                     })
                   }
                 >
@@ -96,8 +95,7 @@ export default function PreviewModal({
                       formId,
                       "direct-filling",
                     ).then((res) => {
-                      // @ts-ignore
-                      window.location.href = res.url;
+                      window.location.href = res.url ?? "";
                     })
                   }
                 >

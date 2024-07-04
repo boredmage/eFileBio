@@ -15,7 +15,7 @@ const BusinessCard = ({ business }: { business: Business }) => {
 
       <div className="space-y-2 text-center">
         <h2 className="text-xl font-semibold">{business.name}</h2>
-        <p className="text-center text-sm text-[#525252]">
+        <p className="line-clamp-2 text-ellipsis text-center text-sm text-[#525252]">
           {business.description}
         </p>
       </div>

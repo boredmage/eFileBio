@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { redirect } from "next/navigation";
-import { Business, Form as FormType } from "@prisma/client";
+import { Business } from "@prisma/client";
 import { iFullFormType } from "@/types";
 
 async function getFormData(

@@ -44,7 +44,6 @@ const FormStep4 = ({
   const handleAddSection = () => {
     setSection([...section, {}]);
     setFieldValue("bo", [...bo, boFormShape]);
-    console.log("Add new section");
   };
 
   const removeSection = (index: number) => {
@@ -58,7 +57,7 @@ const FormStep4 = ({
 
   useEffect(() => {
     setSection(bo.length > 0 ? bo : [boFormShape]);
-  }, []);
+  }, [bo]);
 
   return (
     <form onSubmit={handleSubmit}>

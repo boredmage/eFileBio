@@ -3,15 +3,54 @@
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import { getServerSession } from "next-auth";
 import { prisma } from "./db";
-import { iFormType } from "@/app/(dashboard)/dashboard/[businessId]/[formId]/form";
-import { AddressType, FillingStatus } from "@prisma/client";
+import {
+  AddressType,
+  FiForm,
+  FillingStatus,
+  Identification,
+  IdentifyingDocument,
+  RcForm,
+  boForm,
+  caForm,
+} from "@prisma/client";
 import { revalidatePath } from "next/cache";
+
+interface ID {
+  identification: Identification;
+  identifyingDocument: IdentifyingDocument;
+}
+
+type iIdentification = Partial<
+  Pick<ID, "identification" | "identifyingDocument">
+>;
+type iFormExclusives = "createdAt" | "updatedAt" | "formId";
+type iFormIDExclusives =
+  | iFormExclusives
+  | "identificationId"
+  | "identifyingDocumentId";
+
+type iFiEntry = Omit<FiForm, iFormExclusives> & Partial<Pick<FiForm, "formId">>;
+type iRcEntry = Omit<RcForm, iFormExclusives> & Partial<Pick<RcForm, "formId">>;
+type iCaEntry = Omit<caForm, iFormIDExclusives> &
+  Partial<Pick<caForm, "formId">> &
+  iIdentification;
+type iBoEntry = Omit<boForm, iFormIDExclusives> &
+  Partial<Pick<boForm, "formId">> & {
+    identification: Identification | null;
+    identifyingDocument: IdentifyingDocument | null;
+  };
 
 export const saveForm = async (
   businessId: string,
   formId: string,
   formStep: number,
-  formData: iFormType,
+  formData: {
+    fi: iFiEntry;
+    rc: iRcEntry;
+    ca: iCaEntry[];
+    bo: iBoEntry[];
+  },
+  revalidateForm?: boolean,
 ) => {
   try {
     const session = await getServerSession(authOptions);
@@ -48,38 +87,8 @@ export const saveForm = async (
     }
 
     const { fi, rc, ca, bo } = formData;
-
-    [fi, rc].forEach((form) => {
-      // @ts-expect-error
-      delete form.formId;
-      // @ts-expect-error
-      delete form.id;
-      // @ts-expect-error
-      delete form.createdAt;
-      // @ts-expect-error
-      delete form.updatedAt;
-    });
-
-    [ca, bo].forEach((forms) => {
-      forms.forEach((form) => {
-        if (!form.identification?.id) {
-          // @ts-expect-error
-          delete form.identification.id;
-        }
-        if (!form.identifyingDocument?.id) {
-          // @ts-expect-error
-          delete form.identifyingDocument.id;
-        }
-        // @ts-expect-error
-        delete form.formId;
-        // @ts-expect-error
-        delete form.id;
-        // @ts-expect-error
-        delete form.createdAt;
-        // @ts-expect-error
-        delete form.updatedAt;
-      });
-    });
+    const { formId: fiFormId, id: fiId, ...restFiData } = fi;
+    const { formId: rcFormId, id: rcId, ...restRcData } = rc;
 
     if (formStep === 0 && fi.filingType === "INITIAL") {
       // Archive all forms for this business where the filing type is INITIAL and id is not the current form
@@ -109,13 +118,18 @@ export const saveForm = async (
         updatedAt: new Date(),
         fi: {
           upsert: {
-            create: { ...fi },
-            update: { ...fi },
+            create: { ...restFiData },
+            update: { ...restFiData, updatedAt: new Date() },
           },
         },
         rc:
           formStep > 0
-            ? { upsert: { create: { ...rc }, update: { ...rc } } }
+            ? {
+                upsert: {
+                  create: { ...restRcData },
+                  update: { ...restRcData, updatedAt: new Date() },
+                },
+              }
             : {},
         ca: {
           deleteMany: {
@@ -126,48 +140,51 @@ export const saveForm = async (
               formStep > 1
                 ? await Promise.all(
                     ca.map(async (entry) => {
-                      const { identification, identifyingDocument } = entry;
-                      const identificationData = {
-                        data: { ...identification },
-                      };
-                      const identifyingDocumentData = {
-                        data: { ...identifyingDocument },
-                      };
+                      const {
+                        formId,
+                        id: caEntryId,
+                        identification,
+                        identifyingDocument,
+                        ...caEntryData
+                      } = entry;
 
-                      const createdIdentification = identification.id
-                        ? await prisma.identification.update({
-                            where: { id: identification.id },
-                            ...identificationData,
-                          })
-                        : await prisma.identification.create(
-                            identificationData,
-                          );
+                      let createdIdentification, createdIdentifyingDocument;
 
-                      const createdIdentifyingDocument = identifyingDocument.id
-                        ? await prisma.identifyingDocument.update({
-                            where: { id: identifyingDocument.id },
-                            ...identifyingDocumentData,
-                          })
-                        : await prisma.identifyingDocument.create(
-                            identifyingDocumentData,
-                          );
-
-                      if (entry.hasOwnProperty("identification")) {
-                        // @ts-expect-error
-                        delete entry?.identification;
+                      if (identification) {
+                        const { id: identificationId, ...identificationData } =
+                          identification;
+                        createdIdentification = identificationId
+                          ? await prisma.identification.update({
+                              where: { id: identificationId },
+                              data: { ...identificationData },
+                            })
+                          : await prisma.identification.create({
+                              data: { ...identificationData },
+                            });
                       }
 
-                      if (entry.hasOwnProperty("identifyingDocument")) {
-                        // @ts-expect-error
-                        delete entry.identifyingDocument;
+                      if (identifyingDocument) {
+                        const {
+                          id: identifyingDocumentId,
+                          ...identifyingDocumentData
+                        } = identifyingDocument;
+
+                        createdIdentifyingDocument = identifyingDocumentId
+                          ? await prisma.identifyingDocument.update({
+                              where: { id: identifyingDocumentId },
+                              data: { ...identifyingDocumentData },
+                            })
+                          : await prisma.identifyingDocument.create({
+                              data: { ...identifyingDocumentData },
+                            });
                       }
 
                       return {
-                        ...entry,
+                        ...caEntryData,
                         addressType: entry.addressType as AddressType,
                         dob: new Date(entry.dob ? entry.dob : 0),
-                        identificationId: createdIdentification.id,
-                        identifyingDocumentId: createdIdentifyingDocument.id,
+                        identificationId: createdIdentification!.id,
+                        identifyingDocumentId: createdIdentifyingDocument!.id,
                       };
                     }),
                   )
@@ -184,53 +201,47 @@ export const saveForm = async (
                 ? await Promise.all(
                     bo.map(async (entry) => {
                       const {
+                        formId,
+                        id: boEntryId,
                         identification,
                         identifyingDocument,
                         isExemptEntity,
+                        ...boEntryData
                       } = entry;
 
                       let createdIdentification, createdIdentifyingDocument;
-                      const identificationData = {
-                        data: { ...identification },
-                      };
-                      const identifyingDocumentData = {
-                        data: { ...identifyingDocument },
-                      };
 
                       if (!isExemptEntity && identification) {
-                        createdIdentification = identification.id
+                        const { id: identificationId, ...identificationData } =
+                          identification;
+                        createdIdentification = identificationId
                           ? await prisma.identification.update({
-                              where: { id: identification.id },
-                              ...identificationData,
+                              where: { id: identificationId },
+                              data: { ...identificationData },
                             })
                           : await prisma.identification.create({
-                              data: { ...identification },
+                              data: { ...identificationData },
                             });
                       }
 
                       if (!isExemptEntity && identifyingDocument) {
-                        createdIdentifyingDocument = identifyingDocument.id
+                        const {
+                          id: identifyingDocumentId,
+                          ...identifyingDocumentData
+                        } = identifyingDocument;
+                        createdIdentifyingDocument = identifyingDocumentId
                           ? await prisma.identifyingDocument.update({
-                              where: { id: identifyingDocument.id },
-                              ...identifyingDocumentData,
+                              where: { id: identifyingDocumentId },
+                              data: { ...identifyingDocumentData },
                             })
                           : await prisma.identifyingDocument.create({
-                              data: { ...identifyingDocument },
+                              data: { ...identifyingDocumentData },
                             });
                       }
 
-                      if (entry.hasOwnProperty("identification")) {
-                        // @ts-expect-error
-                        delete entry?.identification;
-                      }
-
-                      if (entry.hasOwnProperty("identifyingDocument")) {
-                        // @ts-expect-error
-                        delete entry.identifyingDocument;
-                      }
-
                       return {
-                        ...entry,
+                        ...boEntryData,
+                        isExemptEntity,
                         dob: new Date(entry.dob ? entry.dob : 0),
                         ...(!isExemptEntity && {
                           identificationId:
@@ -264,7 +275,7 @@ export const saveForm = async (
       },
     });
 
-    if (formStep === 0 && fi.filingType === "INITIAL") {
+    if ((formStep === 0 && fi.filingType === "INITIAL") || revalidateForm) {
       revalidatePath(`/forms`);
       revalidatePath(`/forms/${formId}`);
       revalidatePath(`/dashboard/${businessId}`);

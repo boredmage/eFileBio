@@ -1,0 +1,28 @@
+enum AddressType {
+  BUSINESS
+  RESIDENTIAL
+}
+
+model caForm {
+  id                    String              @id @default(cuid())
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+  form                  Form                @relation(fields: [formId], references: [id])
+  formId                String
+  fincenId              String
+  lastName              String
+  middleName            String
+  firstName             String
+  suffix                String
+  dob                   DateTime
+  addressType           AddressType
+  country               String
+  state                 String
+  address               String
+  city                  String
+  zip                   String
+  identification        Identification      @relation(fields: [identificationId], references: [id])
+  identificationId      String              @unique @map("identificationId")
+  identifyingDocument   IdentifyingDocument @relation(fields: [identifyingDocumentId], references: [id])
+  identifyingDocumentId String              @unique @map("identifyingDocumentId")
+}

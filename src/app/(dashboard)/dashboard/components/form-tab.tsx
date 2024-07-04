@@ -34,7 +34,7 @@ const FormTab = ({
         >
           <span
             className={clsx(
-              "float-left flex gap-2 rounded-t-2xl px-5 py-3 before:absolute before:-left-5 before:bottom-0 before:h-5 before:w-5 before:rounded-full before:bg-[#E5E5E5] after:absolute after:-right-5 after:bottom-0 after:h-5  after:w-5 after:rounded-full after:bg-[#E5E5E5] md:px-9",
+              "float-left flex gap-2 rounded-t-2xl px-5 py-3 before:absolute before:-left-5 before:bottom-0 before:h-5 before:w-5 before:rounded-full before:bg-[#E5E5E5] after:absolute after:-right-5 after:bottom-0 after:h-5 after:w-5 after:rounded-full after:bg-[#E5E5E5] md:px-9",
               activeTab === index
                 ? "bg-[#fff] before:z-10 after:z-10"
                 : "bg-[#E5E5E5] before:z-20 after:z-20",

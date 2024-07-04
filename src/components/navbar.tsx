@@ -55,7 +55,7 @@ const NavContent = ({ isNavOpen }: { isNavOpen: boolean }) => {
 
       <div className="flex flex-col items-center justify-center md:flex-row md:gap-2">
         <AuthButton type="mininal" />
-        <Button
+        {/* <Button
           radius="full"
           onClick={() => signOut()}
           isIconOnly
@@ -73,7 +73,7 @@ const NavContent = ({ isNavOpen }: { isNavOpen: boolean }) => {
           startContent={<Logout />}
         >
           Logout
-        </Button>
+        </Button> */}
       </div>
     </div>
   );

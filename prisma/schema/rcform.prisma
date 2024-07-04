@@ -1,0 +1,26 @@
+model RcForm {
+  id                               String   @id @default(cuid())
+  createdAt                        DateTime @default(now())
+  updatedAt                        DateTime @updatedAt
+  form                             Form     @relation(fields: [formId], references: [id])
+  formId                           String   @unique
+  isForeignPooledInvestmentVehicle Boolean
+  isRequestingId                   Boolean
+  legalName                        String
+  alternateNames                   String[]
+  taxType                          String
+  taxId                            String
+  taxJurisdiction                  String
+  jurisdiction                     String
+  domesticState                    String?
+  domesticTribalJurisdiction       String?
+  domesticOtherTribe               String
+  foreignFirstState                String
+  foreignTribalJurisdiction        String
+  foreignOtherTribe                String
+  country                          String
+  address                          String
+  city                             String
+  state                            String
+  zip                              String
+}

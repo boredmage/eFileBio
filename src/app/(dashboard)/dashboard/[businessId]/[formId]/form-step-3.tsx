@@ -55,7 +55,7 @@ const FormStep3 = ({
 
   useEffect(() => {
     setSection(ca.length > 0 ? ca : [caFormShape]);
-  }, []);
+  }, [ca]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -104,6 +104,7 @@ const SectionForm = ({
     handleBlur,
     setFieldError,
     setFieldTouched,
+    setValues,
   } = formData;
   const { ca: value } = values;
   const { ca: touch } = touched;
@@ -156,22 +157,35 @@ const SectionForm = ({
   };
 
   const clearIdentificationData = () => {
-    setFieldValue(`ca.${level}.identification.state`, "");
-    setFieldValue(`ca.${level}.identification.jurisdiction`, "");
-    setFieldValue(`ca.${level}.identification.otherTribe`, "");
-    setFieldValue(`ca.${level}.identification.localTribal`, "");
+    // setFieldValue(`ca.${level}.identification.state`, "");
+    // setFieldValue(`ca.${level}.identification.jurisdiction`, "");
+    // setFieldValue(`ca.${level}.identification.otherTribe`, "");
+    // setFieldValue(`ca.${level}.identification.localTribal`, "");
+
+    setFieldValue(`ca.${level}.identification`, {
+      state: "",
+      jurisdiction: "",
+      otherTribe: "",
+      localTribal: "",
+    });
   };
 
   const handleClientUploadComplete = (res: ClientUploadedFileData<null>[]) => {
     const uploadData = res[0];
     const { name, size, type, url } = uploadData;
     setFieldValue(`ca.${level}.identification.image`, url);
-    setFieldValue(`ca.${level}.identifyingDocument.name`, name);
-    setFieldValue(`ca.${level}.identifyingDocument.size`, size);
-    setFieldValue(`ca.${level}.identifyingDocument.type`, type);
+    // setFieldValue(`ca.${level}.identifyingDocument.name`, name);
+    // setFieldValue(`ca.${level}.identifyingDocument.size`, size);
+    // setFieldValue(`ca.${level}.identifyingDocument.type`, type);
+    setFieldValue(`ca.${level}.identifyingDocument`, {
+      name,
+      size,
+      type,
+    });
     setIsUploadingDoc(false);
-    setFieldError(`ca.${level}.identification.image`, "");
-    setFieldTouched(`ca.${level}.identification.image`, false);
+    // setFieldError(`ca.${level}.identification.image`, "");
+    // setFieldTouched(`ca.${level}.identification.image`, false);
+    // formData.validateForm();
   };
 
   return (
@@ -520,11 +534,16 @@ const SectionForm = ({
               <h2 className="font-semibold">
                 Identifying document <span className="text-red-500">*</span>
               </h2>
+              <input
+                className="border"
+                type="text"
+                {...getFieldProps(`ca.${level}.identification.image`)}
+              />
               {caTouched?.identification?.image &&
                 caError?.identification?.image && (
-                  <p className="text-sm text-red-500">
+                  <span className="text-sm text-red-500">
                     {caError.identification.image}
-                  </p>
+                  </span>
                 )}
             </div>
             {!isPreview && (

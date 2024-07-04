@@ -7,10 +7,13 @@ import { z } from "zod";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/auth-options";
 import {
-  caFormShape,
-  fiFormShape,
-  rcFormShape,
-} from "@/app/(dashboard)/dashboard/[businessId]/[formId]/form-shape";
+  FiForm,
+  FilingType,
+  Identification,
+  IdentifyingDocument,
+  RcForm,
+} from "@prisma/client";
+import { saveForm } from "./form-actions";
 
 const BusinessSchema = z.object({
   name: z.coerce
@@ -145,20 +148,133 @@ export async function createForm(data: { businessId: string }) {
         ownerId: user.id,
         version: formCount + 1,
         businessId: business.id,
-        // fi: {
-        //   create: {
-        //     ...fiFormShape,
-        //   },
-        // },
-        // rc: {
-        //   create: {
-        //     ...rcFormShape,
-        //   },
-        // },
       },
     });
     revalidatePath(`/dashboard/${businessId}`);
-    // redirect(`/dashboard/${businessId}/${newForm.id}`);
+    return newForm;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+export async function duplicateForm(data: {
+  formId: string;
+  fillingType?: FilingType;
+}) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    const { formId, fillingType } = data;
+
+    if (!session || !session.user || !session.user.email) {
+      return redirect("/");
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    });
+
+    if (!user) {
+      return redirect("/");
+    }
+
+    if (!formId) {
+      return new Response("Form ID is required", {
+        status: 400,
+      });
+    }
+
+    const form = await prisma.form.findUnique({
+      where: { id: formId },
+      include: {
+        fi: true,
+        rc: true,
+        ca: {
+          include: {
+            identification: true,
+            identifyingDocument: true,
+          },
+        },
+        bo: {
+          include: {
+            identification: true,
+            identifyingDocument: true,
+          },
+        },
+      },
+    });
+
+    if (!form) {
+      return new Response("Form not found", {
+        status: 404,
+      });
+    }
+
+    const { fi, rc, ca, bo } = form;
+    const newForm = await createForm({ businessId: form.businessId });
+
+    if (!newForm) {
+      return new Response("Failed to duplicate form", {
+        status: 500,
+      });
+    }
+
+    console.log("FORM TO DUPLICATE", form);
+
+    const formData = {
+      fi: (fi || {}) as FiForm,
+      rc: (rc || {}) as RcForm,
+      ca: ca.map((c) => {
+        const {
+          identificationId,
+          identifyingDocumentId,
+          identification,
+          identifyingDocument,
+          ...rest
+        } = c;
+        const { id, ...identificationData } = identification;
+        const { id: docId, ...documentData } = identifyingDocument;
+        return {
+          ...rest,
+          identification: {
+            id: "",
+            ...identificationData,
+          },
+          identifyingDocument: {
+            id: "",
+            ...documentData,
+          },
+        };
+      }),
+      bo: bo.map((b) => {
+        const {
+          identificationId,
+          identifyingDocumentId,
+          identification,
+          identifyingDocument,
+          ...rest
+        } = b;
+        const { ...identificationData } =
+          identification || ({} as Identification);
+        const { ...documentData } =
+          identifyingDocument || ({} as IdentifyingDocument);
+        return {
+          ...rest,
+          identification: {
+            ...identificationData,
+            id: "",
+          },
+          identifyingDocument: {
+            ...documentData,
+            id: "",
+          },
+        };
+      }),
+    };
+
+    if (newForm && "id" in newForm) {
+      await saveForm(form.businessId, newForm.id, 4, formData, true);
+    }
   } catch (error) {
     console.log(error);
   }

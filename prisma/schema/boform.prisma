@@ -1,0 +1,24 @@
+model boForm {
+  id                          String               @id @default(cuid())
+  createdAt                   DateTime             @default(now())
+  updatedAt                   DateTime             @updatedAt
+  form                        Form                 @relation(fields: [formId], references: [id])
+  formId                      String
+  isParentGuardianInformation Boolean?
+  fincenId                    String?
+  isExemptEntity              Boolean
+  lastName                    String
+  middleName                  String?
+  firstName                   String?
+  suffix                      String?
+  dob                         DateTime?
+  country                     String?
+  state                       String?
+  address                     String?
+  city                        String?
+  zip                         String?
+  identification              Identification?      @relation(fields: [identificationId], references: [id])
+  identificationId            String?              @unique @map("identificationId")
+  identifyingDocument         IdentifyingDocument? @relation(fields: [identifyingDocumentId], references: [id])
+  identifyingDocumentId       String?              @unique @map("identifyingDocumentId")
+}

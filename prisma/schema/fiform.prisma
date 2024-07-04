@@ -1,0 +1,12 @@
+model FiForm {
+  id              String     @id @default(cuid())
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  form            Form       @relation(fields: [formId], references: [id])
+  formId          String     @unique
+  filingType      FilingType
+  legalName       String
+  taxType         String
+  taxId           String
+  taxJurisdiction String
+}

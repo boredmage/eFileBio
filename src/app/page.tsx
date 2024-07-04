@@ -17,6 +17,7 @@ import {
 import Footer from "../components/footer";
 import AuthButton from "../components/auth-button";
 import { Button } from "@nextui-org/react";
+import { toast } from "sonner";
 
 export default function Home() {
   return (

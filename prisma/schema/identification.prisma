@@ -1,0 +1,21 @@
+model Identification {
+  id           String  @id @default(cuid())
+  type         String
+  ID           String
+  jurisdiction String
+  state        String?
+  localTribal  String?
+  otherTribe   String?
+  image        String
+  caForm       caForm?
+  boForm       boForm?
+}
+
+model IdentifyingDocument {
+  id     String  @id @default(cuid())
+  name   String
+  size   Int
+  type   String
+  caForm caForm?
+  boForm boForm?
+}

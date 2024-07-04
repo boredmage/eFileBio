@@ -138,12 +138,12 @@ const Form = ({
   }, [formData.values]);
 
   async function saveFormData() {
-    let updatedForm = (await saveForm(
-      businessId,
-      formId,
-      activeTab,
-      formData.values,
-    )) as iForm;
+    let updatedForm = (await saveForm(businessId, formId, activeTab, {
+      fi: formData.values.fi,
+      rc: formData.values.rc,
+      ca: formData.values.ca,
+      bo: formData.values.bo,
+    })) as iForm;
 
     // Update the form with the new data
     if (updatedForm) {
@@ -155,6 +155,10 @@ const Form = ({
   }
 
   const handleNext = async () => {
+    console.log("Active Tab: ", activeTab);
+    console.log("Form Data: ", formData.values);
+    console.log("CA Errors: ", formData.errors.ca);
+
     try {
       if (isFormReadOnly) {
         if (activeTab === 3) {
@@ -203,6 +207,10 @@ const Form = ({
     setActiveTab((currentIndex) => currentIndex - 1);
     scrollToTop();
   };
+
+  useEffect(() => {
+    console.log("Errors: ", formData.errors);
+  }, [formData.errors]);
 
   return (
     <>

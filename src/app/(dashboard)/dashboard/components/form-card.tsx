@@ -15,6 +15,7 @@ import { Clock, EllipsisVertical } from "lucide-react";
 import { getDueDate } from "@/lib/utils";
 import { FillingStatus, FilingType } from "@prisma/client";
 import { chipColor } from "@/utils/constants";
+import { duplicateForm } from "@/lib/actions";
 
 const FormCard = ({
   formId,
@@ -38,7 +39,7 @@ const FormCard = ({
   );
   return (
     <div className="relative">
-      <FormMenu />
+      {/* <FormMenu formId={formId} /> */}
       <Link
         className="block cursor-pointer space-y-5 rounded-xl border border-[#F5F5F5] bg-[#FAFAFA] px-5 py-8"
         href={`/dashboard/${businessId}/${formId}`}
@@ -90,7 +91,7 @@ const FormCard = ({
   );
 };
 
-function FormMenu() {
+function FormMenu({ formId }: { formId: string }) {
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -103,7 +104,14 @@ function FormMenu() {
         </Button>
       </DropdownTrigger>
       <DropdownMenu variant="faded" aria-label="Dropdown menu with icons">
-        <DropdownItem key="new">Duplicate Form</DropdownItem>
+        <DropdownItem
+          key="new"
+          onClick={() => {
+            duplicateForm({ formId });
+          }}
+        >
+          Duplicate Form
+        </DropdownItem>
         <DropdownItem key="edit">Update Prior Report</DropdownItem>
         <DropdownItem key="copy">Correct Prior Report</DropdownItem>
       </DropdownMenu>
