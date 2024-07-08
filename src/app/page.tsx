@@ -97,7 +97,7 @@ export default function Home() {
           />
         </div>
       </div>
-      <div className="overflow-hidden bg-[#FAFAFA]">
+      <div id="Services" className="overflow-hidden bg-[#FAFAFA]">
         <div className="relative mx-auto grid w-[95%] max-w-7xl grid-cols-1 bg-[#FAFAFA] py-12 lg:grid-cols-4">
           <div className="flex flex-col items-start justify-center">
             <div className="flex flex-col items-center justify-center gap-3 text-center lg:w-[600px] lg:items-start lg:text-left">

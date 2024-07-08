@@ -44,10 +44,14 @@ const NavContent = ({ isNavOpen }: { isNavOpen: boolean }) => {
     >
       <Logo className="hidden md:flex" />
       <ul className="flex flex-col items-center gap-4 md:flex-row md:gap-8">
-        {["Home", "Financing", "Our Services", "Blog"].map((item, index) => {
+      {[
+          {name: "Home", url: "/"},
+          {name: "Our Services", url: "/#Services"},
+          {name: "Blog", url: "/"},
+        ].map((item, index) => {
           return (
             <li key={index}>
-              <Link href="/">{item}</Link>
+              <Link href={item.url}>{item.name}</Link>
             </li>
           );
         })}
