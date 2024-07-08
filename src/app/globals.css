@@ -6,4 +6,8 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  body{
+    overflow-y: hidden;
+  }
 }

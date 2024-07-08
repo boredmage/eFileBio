@@ -534,11 +534,12 @@ const SectionForm = ({
               <h2 className="font-semibold">
                 Identifying document <span className="text-red-500">*</span>
               </h2>
-              <input
+              {/* <input
                 className="border"
                 type="text"
+                hidden
                 {...getFieldProps(`ca.${level}.identification.image`)}
-              />
+              /> */}
               {caTouched?.identification?.image &&
                 caError?.identification?.image && (
                   <span className="text-sm text-red-500">

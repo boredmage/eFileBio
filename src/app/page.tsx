@@ -21,7 +21,7 @@ import { toast } from "sonner";
 
 export default function Home() {
   return (
-    <Fragment>
+    <main className="overflow-y-auto h-screen">
       <div className="relative bg-white bg-hero bg-cover bg-center bg-no-repeat py-4 pb-14 shadow-hero">
         <Navbar />
         <div className="space-y-10 pt-24 text-center">
@@ -130,7 +130,7 @@ export default function Home() {
         </div>
       </div>
       <Footer />
-    </Fragment>
+    </main>
   );
 }
 
